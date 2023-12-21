@@ -1,3 +1,9 @@
+# OKO begin
+*.save
+*.bak
+..gitignore.swp
+# OKO end
+
 .settings
 .ppm/
 .vscode/

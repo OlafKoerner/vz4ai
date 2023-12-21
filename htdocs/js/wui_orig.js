@@ -565,55 +565,13 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		hover = vz.options.plot.hoverPos.x;
 	}
 
-	/* OKO already define REST-API url for the case that device button was pressed */
-	var url_rest_api = 'http://192.168.178.185:8082/'
-	var timeframe = Math.round(vz.options.plot.xaxis.min) + '/' + Math.round(vz.options.plot.xaxis.max) + '/';
-
-	/* OKO function to write device ID to database via REST API (bottle) */
-	async function write_device_id_to_db(device_id) {	
-		try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id, { 
-					mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
-				}
-			)
-		} catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
-	}
-
-        /* OKO function to undo last change to database via REST API (bottle) */
-        async function undo_last_change_to_db() {  
-                try { const response = await fetch(url_rest_api + 'update_undo', { 
-                                        mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-                                        signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
-                                }
-                        )
-                } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
-        }
-
-        /* OKO function to write device ID to database via REST API (bottle) */
-        async function read_pi_disk_usage() {       
-                try 
-		{ 
-			const response = await fetch(url_rest_api + 'diskspace', { 
-					mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
-				}
-			)
-			const text = await response.text()
-			return text;
-                } 
-		catch(err) 
-		{ 
-			alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); 
-		} 
-	}
-
 	switch (control) {
 		case 'move-last':
 			startOfPeriodLocale = vz.wui.period == 'week' ? 'isoweek' : vz.wui.period;
 			vz.wui.zoom(
 				/* jshint laxbreak: true */
 				vz.wui.period && moment(vz.options.plot.xaxis.min)
-					.startOf(startOfPeriodLocale)						
+					.startOf(startOfPeriodLocale)
 					.isSame(moment(vz.options.plot.xaxis.min))
 					? moment().startOf(startOfPeriodLocale).valueOf()
 					: moment().valueOf() - delta,
@@ -708,63 +666,28 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			vz.wui.period = period;
 			vz.wui.zoom(min, Math.min(max, moment().valueOf()));
 			break;
- 			/***********************************************
-			* OKO                                          * 
-			************************************************/
-		case 'espresso-machine': 
-			var device_id = 1;
-			write_device_id_to_db(device_id); 
+			/**
+			* OKO 
+			*
+			case 'espresso-machine':
+			var mysql = require('mysql');
+			var con = mysql.createConnection({
+  				host: "localhost",
+  				user: "vzlogger",
+  				password: "demo",
+  				database: "volkszaehler_backup"
+			});
+
+			con.connect(function(err) {
+  				if (err) throw err;
+  				var sql = "UPDATE data SET device = '1' WHERE timestamp = '1670972274123'";
+  				con.query(sql, function (err, result) {
+    					if (err) throw err;
+    					console.log(result.affectedRows + " record(s) updated");
+  				});
+			});
 			break;
-		case 'washing-machine': 
-			var device_id = 2; 
-			write_device_id_to_db(device_id);
-			break;
-		case 'dish-washer': 
-			var device_id = 4; 
-                        write_device_id_to_db(device_id);
-			break;
-		case 'induction-cooker': 
-			var device_id = 8; 
-                        write_device_id_to_db(device_id);
-			break;
-		case 'irrigation-system': 
-			var device_id = 16; 
-                       	write_device_id_to_db(device_id);                 
-			break;
-                case 'oven': 
-                        var device_id = 32; 
-                        write_device_id_to_db(device_id);                 
-                        break;
-                case 'microwave': 
-                        var device_id = 64; 
-                        write_device_id_to_db(device_id);                 
-                        break;
-		case 'kitchen-light': 
-			var device_id = 128; 
-                        write_device_id_to_db(device_id);                 
-  			break;
-		case 'living-room-ligh': 
-			var device_id = 256; 
-                        write_device_id_to_db(device_id);                 
-  			break;
-		case 'dining-room-light': 
-			var device_id = 512; 
-                        write_device_id_to_db(device_id);                 
-  			break;
-		case 'ground-floor-light': 
-			var device_id = 1024; 
-                        write_device_id_to_db(device_id);                 
-  			break;
-		case 'upper-floor-light': 
-			var device_id = 2048; 
-                        write_device_id_to_db(device_id);                 
-  			break;
-		case 'undo-last-change':
-			undo_last_change_to_db();
-			break;
-		case 'get-disk-space':
-        		read_pi_disk_usage().then( text => { alert("Current disk usage and free space: " + text); });
-			break;
+			*/
 	};
 };
 

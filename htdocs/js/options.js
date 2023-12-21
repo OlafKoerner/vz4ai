@@ -39,7 +39,9 @@ vz.options = {
 	middleware: [
 		{
 			title: 'Local (default)',
-			url: 'api'
+			// OKO old 03-12-2022: url: ''
+			// hint: https://www.mail-archive.com/search?l=volkszaehler-users@demo.volkszaehler.org&q=subject:%22Re%5C%3A+%5C%5Bvz%5C-users%5C%5D+Volksz%C3%A4hler+beim+Webhoster%22&o=newest&f=1
+			url: ''
 			// live: 8082					// NOTE: live updates require
 														//    - push-server running and
 														//    - either apache proxy forwarding configured according to
