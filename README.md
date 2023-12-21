@@ -64,3 +64,4 @@ Or follow the detailed installation instructions at http://wiki.volkszaehler.org
 
 Copyright © 2011-2020 volkszaehler.org
 Licensed under the GNU General Public License Version 3 (https://opensource.org/licenses/GPL-3.0).
+# vz4ai

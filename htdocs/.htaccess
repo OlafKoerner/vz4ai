@@ -9,11 +9,21 @@
 </IfModule>
 
 # enable this rule if using ppm middleware
+#<IfModule mod_proxy.c>
+#	RewriteEngine On
+	# OKO eigentlich 8080
+#	RewriteRule ^middleware(.php)?(/.*)? http://localhost:8081$2 [P]
+	# OKO eigentlich 8080	
+#RewriteRule ^api(/.*)? http://localhost:8081$1 [P]
+#</IfModule>
+
 <IfModule mod_proxy.c>
-	# RewriteEngine On
-	# RewriteRule ^middleware(.php)?(/.*)? http://localhost:8080$2 [P]
-	# RewriteRule ^api(/.*)? http://localhost:8080$1 [P]
+        RewriteEngine On
+        RewriteRule ^middleware(.php)?(/.*)? http://192.168.178.185:8080/$2 [P]
+        RewriteRule ^api(/.*)$ http://192.168.178.185:8080/$1 [P]
+        RewriteRule (.*) http://192.168.178.185:8080/$1 [P]
 </IfModule>
+
 
 <IfModule mod_rewrite.c>
 	RewriteEngine On
@@ -27,4 +37,10 @@
 
 <IfModule mod_headers.c>
     Header set Content-Security-Policy "default-src 'self'; connect-src * ws: wss: http: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+    
+    #OKO 2023-10-03: to allow access from volkszaehler frontend (8080) to bottle REST api (8082)
+    #https://stackoverflow.com/questions/20035101/why-does-my-javascript-code-receive-a-no-access-control-allow-origin-header-i
+    Access-Control-Allow-Origin *
+    Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT"
+    Header always set Access-Control-Allow-Headers "My-First-Header,My-Second-Header,Authorization, content-type, csrf-token"
 </IfModule>
