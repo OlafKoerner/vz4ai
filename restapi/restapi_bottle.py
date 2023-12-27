@@ -1,7 +1,7 @@
 from gevent import monkey; monkey.patch_all() # https://bottlepy.org/docs/dev/async.html
 import bottle
 import bottle_mysql
-from bottle import response, request, post
+from bottle import response, post, hook
 import shutil
 
 app = bottle.Bottle()
@@ -10,6 +10,18 @@ plugin = bottle_mysql.Plugin(dbuser='vzlogger', dbpass='demo', dbname='volkszaeh
 app.install(plugin)
 
 update_history = [{}]
+
+# Enable CORS
+_allow_origin = '*'
+_allow_methods = 'PUT, GET, POST, DELETE, OPTIONS'
+_allow_headers = 'Authorization, Origin, Accept, Content-Type, X-Requested-With'
+
+@app.hook('after_request') #TippNicolas
+def enable_cors():
+    #Add headers to enable CORS
+    response.headers['Access-Control-Allow-Origin'] = _allow_origin
+    response.headers['Access-Control-Allow-Methods'] = _allow_methods
+    response.headers['Access-Control-Allow-Headers'] = _allow_headers
 
 @app.route('/show/<ts_from>/<ts_to>')
 def show_device_ids(ts_from, ts_to, db):
@@ -44,12 +56,12 @@ def update_undo(db):
 		db.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
 		update_history.pop() # remove last item
 		return bottle.HTTPResponse(status = 200)
-	else : 
-		print('UPDATE_UNDO: not possible since no update history available') 
+	else :
+		print('UPDATE_UNDO: not possible since no update history available')
 		return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
 
-@app.route('/diskspace')
-def get_remaining_disk_space():
+@app.route('/diskspace', method="POST") #TippNicolas -> POST
+def get_remaining_disk_space() -> dict[str, str]: #TippNicolas "->"
 	KB = 1024
 	MB = 1024 * KB
 	GB = 1024 * MB
@@ -59,9 +71,7 @@ def get_remaining_disk_space():
 	print(response["used_percent"] + " and " +  response["free"])
 	return response
 
-def main():
-    app.run(host='192.168.178.185', port=8082, debug=True, server='gevent')
-    while 1: 1
-
 if __name__ == "__main__":
-    main()
+    # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
+    #app.run(server='gevent', host='127.0.0.1', port=8082, debug=True)
+    app.run(server='gevent', host='192.168.178.185', port=8082, debug=True)
