@@ -3,6 +3,9 @@ import bottle
 import bottle_mysql
 from bottle import response, post, hook
 import shutil
+import numpy as np
+import tensorflow as tf
+import keras
 
 app = bottle.Bottle()
 # dbhost is optional, default is localhost
@@ -71,7 +74,56 @@ def get_remaining_disk_space() -> dict[str, str]: #TippNicolas "->"
 	print(response["used_percent"] + " and " +  response["free"])
 	return response
 
+@app.route('/classification/<ts_from>/<ts_to>/<window_length>', method="POST")
+def get_identified_devices() -> dict[str, str]:
+    device_list = {
+        1: {'name': 'espresso-machine', 'minpow': 800},
+        2: {'name': 'washing-machine', 'minpow': 500},
+        4: {'name': 'dish-washer', 'minpow': 500},
+        8: {'name': 'induction-cooker', 'minpow': 800},
+        16: {'name': 'irrigation-system', 'minpow': 400},
+        32: {'name': 'oven', 'minpow': 800},
+        64: {'name': 'microwave', 'minpow': 800},
+        128: {'name': 'kitchen-light', 'minpow': 200},
+        256: {'name': 'living-room-light', 'minpow': 200},
+        512: {'name': 'dining-room-light', 'minpow': 200},
+        1024: {'name': 'ground-floor-light', 'minpow': 200},
+        2048: {'name': 'upper-floor-light', 'minpow': 200},
+    }
+
+    db.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 10000;',
+               (float(ts_from), float(ts_to)))
+
+    data_list = db.fetchall()
+
+    x = np.array([])
+    xx = np.array([])
+    for row in data_list :
+        x = np.append(x, row['value'])
+
+    i = 0 + window_length
+    while i < x.size:
+        xx = np.append(xx, x[i - window_length: i])
+        i = i + window_length
+
+    xx = xx.reshape((xx.size // window_length, window_length))
+
+    model.load('Devices4Data10000Epoch1000.keras')
+    yy = model.predict(xx)
+
+    identified_devices = np.array([])
+    for i in range(yy.shape[0]) :
+        identified_devices = np.append(identified_devices, argmax(yy[i]))
+    identified_devices = np.unique(identified_devices)
+
+    response = {}
+    for i in identified_devices :
+        response[str(i)] = device_list[str(i)]['name']
+
+    print(response)
+    return response
+
 if __name__ == "__main__":
     # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
-    #app.run(server='gevent', host='127.0.0.1', port=8082, debug=True)
-    app.run(server='gevent', host='192.168.178.185', port=8082, debug=True)
+    app.run(server='gevent', host='127.0.0.1', port=8082, debug=True)
+    #app.run(server='gevent', host='192.168.178.185', port=8082, debug=True)
