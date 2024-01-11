@@ -3,3 +3,6 @@ bottle
 bottle_mysql
 pymysqldb
 gunicorn
+numpy
+tensorflow
+keras
