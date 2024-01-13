@@ -1,16 +1,18 @@
 from gevent import monkey; monkey.patch_all() # https://bottlepy.org/docs/dev/async.html
 import bottle
-import bottle_mysql
+#import bottle_mysql
 from bottle import response, post, hook
+#from bottle_cors_plugin import cors_plugin
 import shutil
 import numpy as np
 import tensorflow as tf
-import keras
+#import keras
 
 app = bottle.Bottle()
 # dbhost is optional, default is localhost
-plugin = bottle_mysql.Plugin(dbuser='vzlogger', dbpass='demo', dbname='volkszaehler')
-app.install(plugin)
+#plugin = bottle_mysql.Plugin(dbuser='vzlogger', dbpass='demo', dbname='volkszaehler')
+#app.install(plugin)
+#app.install(cors_plugin('*'))
 
 update_history = [{}]
 
@@ -22,11 +24,11 @@ _allow_headers = 'Authorization, Origin, Accept, Content-Type, X-Requested-With'
 @app.hook('after_request') #TippNicolas
 def enable_cors():
     #Add headers to enable CORS
-    response.headers['Access-Control-Allow-Origin'] = _allow_origin
-    response.headers['Access-Control-Allow-Methods'] = _allow_methods
-    response.headers['Access-Control-Allow-Headers'] = _allow_headers
+    bottle.response.headers['Access-Control-Allow-Origin'] = _allow_origin
+    bottle.response.headers['Access-Control-Allow-Methods'] = _allow_methods
+    bottle.response.headers['Access-Control-Allow-Headers'] = _allow_headers
 
-@app.route('/show/<ts_from>/<ts_to>')
+@app.route('/show/<ts_from>/<ts_to>', method=['POST', 'OPTIONS'])
 def show_device_ids(ts_from, ts_to, db):
     db.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 1000;',
                (float(ts_from), float(ts_to)))
@@ -45,14 +47,14 @@ def show_device_ids(ts_from, ts_to, db):
     return bottle.template(s, **d)
     #return bottle.HTTPError(404, "Page not found")
 
-@app.route('/update/<ts_from>/<ts_to>/<device_id>')
+@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST', 'OPTIONS'])
 def update_device_ids(ts_from, ts_to, device_id, db):
     db.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
     update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
     print('UPDATE: size of update history now: ', len(update_history))
     return bottle.HTTPResponse(status = 200)
 
-@app.route('/update_undo')
+@app.route('/update_undo', method=['POST', 'OPTIONS'])
 def update_undo(db):
 	if len(update_history) > 1 :
 		print('UPDATE_UNDO: clear device_id ' + update_history[-1]["device_id"] + ' from ' + update_history[-1]["ts_from"] + ' till ' + update_history[-1]["ts_to"])
@@ -63,7 +65,7 @@ def update_undo(db):
 		print('UPDATE_UNDO: not possible since no update history available')
 		return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
 
-@app.route('/diskspace', method="POST") #TippNicolas -> POST
+@app.route('/diskspace', method=['POST', 'OPTIONS']) #TippNicolas -> POST
 def get_remaining_disk_space() -> dict[str, str]: #TippNicolas "->"
 	KB = 1024
 	MB = 1024 * KB

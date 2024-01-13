@@ -6,3 +6,4 @@ gunicorn
 numpy
 tensorflow
 keras
+bottle-cors-plugin
