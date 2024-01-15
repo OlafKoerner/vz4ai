@@ -138,7 +138,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str) -> dict[st
     response = {}
     for i in identified_devices:
         id = 2**int(i)
-        response[str(id)] = device_list[int(i+1)]['name']
+        response[str(id)] = device_list[id]['name']
 
     print(response)
     return response
