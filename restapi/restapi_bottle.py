@@ -1,3 +1,4 @@
+import socket
 from decouple import Config, RepositoryEnv, Csv
 from gevent import monkey; monkey.patch_all() # https://bottlepy.org/docs/dev/async.html
 import bottle
@@ -15,13 +16,16 @@ app = bottle.Bottle()
 update_history = [{}]
 
 def connect_mysql() :
-    config = Config(RepositoryEnv("/Users/Olaf/Documents/GitHub/vz4ai/restapi/.env"))
+    if socket.gethostname() == 'raspberrypi':
+        config = Config(RepositoryEnv("./.env"))
+    else:
+        config = Config(RepositoryEnv("./.env"))
     return pymysql.connect(
-    host=config('myhost'),
-    user=config('myuser'),
-    password=config('mypassword'),
-    database=config('mydatabase'),
-    cursorclass=pymysql.cursors.DictCursor)
+        host=config('myhost'),
+        user=config('myuser'),
+        password=config('mypassword'),
+        database=config('mydatabase'),
+        cursorclass=pymysql.cursors.DictCursor)
 
 # Enable CORS
 _allow_origin = '*'
@@ -35,13 +39,13 @@ def enable_cors():
     bottle.response.headers['Access-Control-Allow-Methods'] = _allow_methods
     bottle.response.headers['Access-Control-Allow-Headers'] = _allow_headers
 
-@app.route('/show/<ts_from>/<ts_to>', method=['POST', 'OPTIONS'])
+@app.route('/show/<ts_from>/<ts_to>', method=['GET', 'POST', 'OPTIONS'])
 def show_device_ids(ts_from, ts_to):
     conn = connect_mysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 1000;',
                (float(ts_from), float(ts_to)))
-    row = db.fetchone()
+    row = cur.fetchone()
     s = ''
     i = 0
     d = {}
@@ -51,10 +55,9 @@ def show_device_ids(ts_from, ts_to):
         d['t' + str(i)] = row['timestamp']
         d['v' + str(i)] = row['value']
         d['d' + str(i)] = row['device']
-        row = db.fetchone()
+        row = cur.fetchone()
     conn.close()
     return bottle.template(s, **d)
-    #return bottle.HTTPError(404, "Page not found")
 
 @app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST', 'OPTIONS'])
 def update_device_ids(ts_from, ts_to, device_id):
@@ -63,7 +66,7 @@ def update_device_ids(ts_from, ts_to, device_id):
     cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
     update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
     print('UPDATE: size of update history now: ', len(update_history))
-    conn.clode()
+    conn.close()
     return bottle.HTTPResponse(status = 200)
 
 @app.route('/update_undo', method=['GET', 'POST', 'OPTIONS'])
@@ -82,14 +85,14 @@ def update_undo():
 
 @app.route('/diskspace', method=['GET', 'POST', 'OPTIONS']) #TippNicolas -> POST
 def get_remaining_disk_space() -> dict[str, str]: #TippNicolas "->"
-	KB = 1024
-	MB = 1024 * KB
-	GB = 1024 * MB
-	total, used, free = shutil.disk_usage('/')
-	used_percent = used / total * 100
-	response =  {"used_percent" : '{:,}'.format(round(used_percent)) + "%", "free" : '{:,}'.format(round(free / KB)) + " KB"}
-	print(response["used_percent"] + " and " +  response["free"])
-	return response
+    KB = 1024
+    MB = 1024 * KB
+    GB = 1024 * MB
+    total, used, free = shutil.disk_usage('/')
+    used_percent = used / total * 100
+    response =  {"used_percent" : '{:,}'.format(round(used_percent)) + "%", "free" : '{:,}'.format(round(free / KB)) + " KB"}
+    print(response["used_percent"] + " and " +  response["free"])
+    return response
 
 @app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET', 'POST', 'OPTIONS'])
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str) -> dict[str, str]:
@@ -126,7 +129,6 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str) -> dict[st
         i = i + window_length
 
     xx = xx.reshape((xx.size // window_length, window_length))
-
     model = keras.models.load_model('Devices4Data10000Epoch1000.keras')
     yy = model.predict(xx)
 
@@ -145,5 +147,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str) -> dict[st
 
 if __name__ == "__main__":
     # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
-    app.run(server='gevent', host='127.0.0.1', port=8082, debug=True)
-    #app.run(server='gevent', host='192.168.178.185', port=8082, debug=True)
+    if socket.gethostname() == 'raspberrypi':
+        app.run(server='gevent', host='192.168.178.185', port=8082, debug=True)
+    else:
+        app.run(server='gevent', host='127.0.0.1', port=8082, debug=True)
