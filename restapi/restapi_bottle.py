@@ -10,16 +10,17 @@ import numpy as np
 import tensorflow as tf
 import keras
 
+if socket.gethostname() == 'raspberrypi':
+    config = Config(RepositoryEnv("./.env"))
+else:
+    config = Config(RepositoryEnv("./.env"))
+
 app = bottle.Bottle()
 #app.install(cors_plugin('*'))
 
 update_history = [{}]
 
 def connect_mysql() :
-    if socket.gethostname() == 'raspberrypi':
-        config = Config(RepositoryEnv("./.env"))
-    else:
-        config = Config(RepositoryEnv("./.env"))
     return pymysql.connect(
         host=config('myhost'),
         user=config('myuser'),
@@ -147,7 +148,4 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str) -> dict[st
 
 if __name__ == "__main__":
     # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
-    if socket.gethostname() == 'raspberrypi':
-        app.run(server='gevent', host='192.168.178.185', port=8082, debug=True)
-    else:
-        app.run(server='gevent', host='127.0.0.1', port=8082, debug=True)
+    app.run(server='gevent', host=config('myhost'), port=config('myport'), debug=True)
