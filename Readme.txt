@@ -1,9 +1,9 @@
 Pre-requisites for running on raspberry-pi-4 and macOS 13.2.1:
 - python 3.7.3 (restriction on pi-4)
+- downgrade numpy<1.19.0 (eg. 1.18.5) to avoid build braking according to #4 referring to code change in #5
 - building tensorflow-2.2.0 for macOS:
 -- bazel-2.0.0 and GCC-7.3.1 (see #1)
 -- compiler bugfix mentioned in #2 and described in #3
--- downgrade numpy<1.19.0 according to #4 referring to code change in #5
 -- compiler bugfix mentioned in #6 but at different code lines
 
 
