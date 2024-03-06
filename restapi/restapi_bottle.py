@@ -6,8 +6,8 @@ import pymysql
 from bottle import response, post, hook
 #from bottle_cors_plugin import cors_plugin
 import shutil
-import numpy as np
-import tensorflow as tf
+import numpy as np # https://www.nbshare.io/notebook/505221353/ERROR-Could-not-find-a-version-that-satisfies-the-requirement-numpy==1-22-3/
+import tensorflow as tf # https://qengineering.eu/install-tensorflow-2.2.0-on-raspberry-pi-4.html
 import keras
 
 if socket.gethostname() == 'raspberrypi':
@@ -85,7 +85,7 @@ def update_undo():
         return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
 
 @app.route('/diskspace', method=['GET', 'POST', 'OPTIONS']) #TippNicolas -> POST
-def get_remaining_disk_space() -> dict[str, str]: #TippNicolas "->"
+def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
     KB = 1024
     MB = 1024 * KB
     GB = 1024 * MB
@@ -96,7 +96,7 @@ def get_remaining_disk_space() -> dict[str, str]: #TippNicolas "->"
     return response
 
 @app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET', 'POST', 'OPTIONS'])
-def get_identified_devices(ts_from_str, ts_to_str, window_length_str) -> dict[str, str]:
+def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
     device_list = {
         1: {'name': 'espresso-machine', 'minpow': 800},
         2: {'name': 'washing-machine', 'minpow': 500},
@@ -130,7 +130,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str) -> dict[st
         i = i + window_length
 
     xx = xx.reshape((xx.size // window_length, window_length))
-    model = keras.models.load_model('Devices4Data10000Epoch1000.keras')
+    model = keras.models.load_model('Devices4Data10000Epoch1000.h5')
     yy = model.predict(xx)
 
     identified_devices = np.array([])
