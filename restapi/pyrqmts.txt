@@ -1,0 +1,8 @@
+python-decouple
+gevent
+bottle
+pymysqldb
+gunicorn
+numpy
+tensorflow
+keras
