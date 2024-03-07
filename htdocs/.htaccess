@@ -41,6 +41,8 @@
     #OKO 2023-10-03: to allow access from volkszaehler frontend (8080) to bottle REST api (8082)
     #https://stackoverflow.com/questions/20035101/why-does-my-javascript-code-receive-a-no-access-control-allow-origin-header-i
     Access-Control-Allow-Origin *
+    Access-Control-Allow-Methods *
+    Access-Control-Allow-Headers *
     Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT"
     Header always set Access-Control-Allow-Headers "My-First-Header,My-Second-Header,Authorization, content-type, csrf-token"
 </IfModule>
