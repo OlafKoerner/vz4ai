@@ -600,7 +600,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
                     				'Accept': 'application/json',
                     				'Content-Type': 'application/json'
 					},
-					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+					//OKO not owrking for old iPhone: signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 				}
 			)
 			const text = await response.text()
@@ -857,7 +857,7 @@ vz.wui.refresh = function() {
                                                 'Accept': 'application/json',
                                                 'Content-Type': 'application/json'
                                         },
-                                        signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+                                        //OKO not working for old iPhone: signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
                                 }
                         )
                         const text = await response.text()
@@ -869,7 +869,10 @@ vz.wui.refresh = function() {
                 } 
         }
 	//OKO draw current diskspace
-	read_pi_disk_usage().then( text => { $('#diskspace').html(text); });
+	read_pi_disk_usage().then( text => { 
+		textObject = JSON.parse(text); 
+		$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free); 
+	});
 
 	var delta = vz.options.plot.xaxis.max - vz.options.plot.xaxis.min;
 	vz.wui.zoom( // move plot
