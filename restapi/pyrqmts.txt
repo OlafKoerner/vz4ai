@@ -3,6 +3,5 @@ gevent
 bottle
 pymysqldb
 gunicorn
-numpy
-tensorflow
+numpy==1.22.3
 keras
