@@ -23,11 +23,13 @@
  * along with volkszaehler.org. If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace Volkszaehler;
+
+
 //OKO 2023-10-03 to allow cross domain access to reach botte REST api
 //https://stackoverflow.com/questions/20035101/why-does-my-javascript-code-receive-a-no-access-control-allow-origin-header-i
 //<?php header('Access-Control-Allow-Origin: *'); ?>
 
-namespace Volkszaehler;
 
 use Symfony\Component\HttpFoundation\Request;
 
