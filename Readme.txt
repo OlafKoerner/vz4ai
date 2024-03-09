@@ -5,13 +5,14 @@ Pre-requisites for running on raspberry-pi-4 and macOS 13.2.1:
 -- bazel-2.0.0 and GCC-7.3.1 (see #1)
 -- compiler bugfix mentioned in #2 and described in #3
 -- compiler bugfix mentioned in #6 but at different code lines
-
-
+- build wheel:
+-- install gsed and replace call sed by gsed: https://github.com/tensorflow/tensorflow/issues/45434
 -
 
 
 How to install
 
+GIT REMOTE handling: https://stackoverflow.com/questions/11935633/git-diff-between-a-remote-and-local-repository
 
 
 References:
