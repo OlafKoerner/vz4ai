@@ -1,0 +1,31 @@
+bottle==0.12.25
+bottle-mysql==0.3.1
+gevent==22.10.2
+greenlet==3.0.3
+gunicorn==21.2.0
+numpy==1.21.6
+packaging==23.2
+PyMySQL==1.1.0
+PyMysqlDB==0.0.2
+python-decouple==3.8
+zope.event==5.0
+zope.interface==6.1
+#gfortran
+#libhdf5-dev 
+#libc-ares-dev 
+#libeigen3-dev
+#libatlas-base-dev 
+#libopenblas-dev 
+#libblas-dev
+#openmpi-bin 
+#libopenmpi-dev
+#liblapack-dev 
+#cython
+#keras_applications==1.0.8 --no-deps
+#keras_preprocessing==1.1.0 --no-deps
+#-U --user six wheel mock
+pybind11
+h5py==2.10.0
+#--upgrade setuptools
+gdown
+
