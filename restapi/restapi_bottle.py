@@ -8,12 +8,10 @@ from bottle import response, post, hook
 import shutil
 import numpy as np # https://www.nbshare.io/notebook/505221353/ERROR-Could-not-find-a-version-that-satisfies-the-requirement-numpy==1-22-3/
 import tensorflow as tf # https://qengineering.eu/install-tensorflow-2.2.0-on-raspberry-pi-4.html
-import keras
+#import keras
+import tensorflow.keras as keras
 
-if socket.gethostname() == 'raspberrypi':
-    config = Config(RepositoryEnv("./.env"))
-else:
-    config = Config(RepositoryEnv("./.env"))
+config = Config(RepositoryEnv("./.env"))
 
 app = bottle.Bottle()
 #app.install(cors_plugin('*'))
@@ -21,8 +19,10 @@ app = bottle.Bottle()
 update_history = [{}]
 
 def connect_mysql() :
+    # reload .env to exchange keras models on-the-fly
+    config.__init__(RepositoryEnv("./.env"))
     return pymysql.connect(
-        host=config('myhost'),
+        host='localhost',
         user=config('myuser'),
         password=config('mypassword'),
         database=config('mydatabase'),
@@ -111,6 +111,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
         1024: {'name': 'ground-floor-light', 'minpow': 200},
         2048: {'name': 'upper-floor-light', 'minpow': 200},
     }
+
     conn = connect_mysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 10000;',
@@ -123,14 +124,15 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     for row in data_list:
         x = np.append(x, row['value'])
 
-    window_length = int(window_length_str)
+    window_length = int(config('keras_window_length'))
+
     i = 0 + window_length
     while i < x.size:
         xx = np.append(xx, x[i - window_length: i])
         i = i + window_length
 
     xx = xx.reshape((xx.size // window_length, window_length))
-    model = keras.models.load_model('Devices4Data10000Epoch1000.h5')
+    model = keras.models.load_model(config('keras_filename'))
     yy = model.predict(xx)
 
     identified_devices = np.array([])
@@ -145,6 +147,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
     print(response)
     return response
+
 
 if __name__ == "__main__":
     # 'gevent' opens many threads to handle async. alternative: 'gunicorn'

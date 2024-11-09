@@ -589,7 +589,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
                 } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
         }
 
-        /* OKO function to write device ID to database via REST API (bottle) */
+        /* OKO function to read pi disk usage via REST API (bottle) */
         async function read_pi_disk_usage() {       
                 try 
 		{ 
@@ -610,6 +610,29 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		{ 
 			alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); 
 		} 
+	}
+
+        /* OKO function to predict device via REST API (bottle) */
+        async function read_device_classification() {
+                try
+                {
+                        var window = 20;
+			const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
+                                        /*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+                                        method: "POST",
+                                        headers: {
+                                                'Accept': 'application/json',
+                                                'Content-Type': 'application/json'
+                                        },
+				}
+			)
+                        const text = await response.text()
+                        return text;
+                }
+                catch(err)
+                {
+                        alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);
+		}
 	}
 
 	switch (control) {
@@ -767,9 +790,11 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		case 'undo-last-change':
 			undo_last_change_to_db();
 			break;
-		case 'get-disk-space':
-        		read_pi_disk_usage().then( text => { alert("Current disk usage and free space: " + text); });
-			//$('#diskspace').html(text);
+		case 'classification':
+        		read_device_classification().then( text => { alert("Device classification: " + text); });
+			break;
+		case 'get-time-frame':
+        		alert("Time frame: " + timeframe);
 			break;
 	};
 };
@@ -871,7 +896,8 @@ vz.wui.refresh = function() {
 	//OKO draw current diskspace
 	read_pi_disk_usage().then( text => { 
 		textObject = JSON.parse(text); 
-		$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free); 
+		$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free);
+		$('#controls#espresso-machine').html("test"); //OKO test
 	});
 
 	var delta = vz.options.plot.xaxis.max - vz.options.plot.xaxis.min;
