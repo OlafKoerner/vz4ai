@@ -8,7 +8,6 @@ from bottle import response, post, hook
 import shutil
 import numpy as np # https://www.nbshare.io/notebook/505221353/ERROR-Could-not-find-a-version-that-satisfies-the-requirement-numpy==1-22-3/
 import tensorflow as tf # https://qengineering.eu/install-tensorflow-2.2.0-on-raspberry-pi-4.html
-#import keras
 import tensorflow.keras as keras
 
 config = Config(RepositoryEnv("./.env"))
@@ -147,7 +146,6 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
     print(response)
     return response
-
 
 if __name__ == "__main__":
     # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
