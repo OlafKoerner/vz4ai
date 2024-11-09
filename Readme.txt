@@ -9,6 +9,27 @@ Pre-requisites for running on raspberry-pi-4 and macOS 13.2.1:
 -- install gsed and replace call sed by gsed: https://github.com/tensorflow/tensorflow/issues/45434
 -
 
+Update from March 2024 to create Wheel for MacOS M1 Arm64 architecture:
+https://community.arm.com/arm-community-blogs/b/ai-and-ml-blog/posts/building-bazel-and-tensorflow-2-x-on-aarch64
+- Additional fixes:
+-- add Aarch64 to bazel building script as in https://linaro.atlassian.net/wiki/spaces/BDTS/pages/20403913217/Building+and+Installing+Tensorflow+on+AArch64
+-- change source of javabase in bazel call as mentioned in https://github.com/bazelbuild/bazel/issues/6993
+#-- bazel build //src:bazel --sandbox_debug --verbose_failures --javabase=@bazel_tools//tools/jdk:remote_jdk
+-- fix zlib/gzguts.h according to https://github.com/fweikert/bazel/commit/5645b5a163064dda218d82633e4f33d4c16527fa
+-- activate python3.7 env
+-- bazel build //src:bazel --sandbox_debug --verbose_failures --javabase=@bazel_tools//tools/jdk:remote_jdk
+
+- Call from cloned tensorflow folder:
+#- $ date; bazel build //tensorflow/tools/pip_package:build_pip_package --config noaws --config=monolithic --local_cpu_resources=4; date
+date; bazel build //tensorflow/tools/pip_package:wheel --repo_env=WHEEL_NAME=tensorflow_cpu --config noaws --config=monolithic --local_cpu_resources=4; date
+date; bazel build //tensorflow/tools/pip_package:build_pip_package --config noaws --config=monolithic --local_cpu_resources=4 --macos_cpus=arm64; date
+
+Target //tensorflow/tools/pip_package:build_pip_package up-to-date:
+  bazel-bin/tensorflow/tools/pip_package/build_pip_package
+INFO: Elapsed time: 7596.993s, Critical Path: 340.49s
+INFO: 17300 processes: 17300 local.
+INFO: Build completed successfully, 17522 total actions
+Mo  1 Apr 2024 17:14:35 CEST
 
 How to install
 
