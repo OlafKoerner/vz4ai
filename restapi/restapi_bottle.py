@@ -33,12 +33,14 @@ _allow_origin = '*'
 _allow_methods = 'PUT, GET, POST, DELETE, OPTIONS'
 _allow_headers = 'Authorization, Origin, Accept, Content-Type, X-Requested-With'
 
+
 @app.hook('after_request') #TippNicolas
 def enable_cors():
     #Add headers to enable CORS
     bottle.response.headers['Access-Control-Allow-Origin'] = _allow_origin
     bottle.response.headers['Access-Control-Allow-Methods'] = _allow_methods
     bottle.response.headers['Access-Control-Allow-Headers'] = _allow_headers
+
 
 @app.route('/show/<ts_from>/<ts_to>', method=['GET', 'OPTIONS'], name='show')
 def show_device_ids(ts_from, ts_to):
@@ -60,37 +62,6 @@ def show_device_ids(ts_from, ts_to):
     conn.close()
     return bottle.template(s, **d)
 
-@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST', 'OPTIONS'], name='update')
-def update_device_ids(ts_from, ts_to, device_id):
-    try:
-        print('OKO debugging mode...')
-        conn = connect_mysql()
-        cur = conn.cursor()
-        print(conn, cur)
-        #cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
-        a = cur.execute('UPDATE data SET device = 2 WHERE timestamp > "%s" AND timestamp < "%s"', (float(ts_from), float(ts_to)))
-        print(a)
-        update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
-        print('UPDATE: size of update history now: ', len(update_history))
-        conn.close()
-        return bottle.HTTPResponse(status = 200)
-    except MySQLError as e:
-        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
-    
-
-@app.route('/update_undo', method=['POST', 'OPTIONS'], name='update_undo')
-def update_undo():
-    if len(update_history) > 1 :
-        conn = connect_mysql()
-        cur = conn.cursor()
-        print('UPDATE_UNDO: clear device_id ' + update_history[-1]["device_id"] + ' from ' + update_history[-1]["ts_from"] + ' till ' + update_history[-1]["ts_to"])
-        cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
-        update_history.pop() # remove last item
-        conn.close()
-        return bottle.HTTPResponse(status = 200)
-    else :
-        print('UPDATE_UNDO: not possible since no update history available')
-        return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
 
 @app.route('/device_data/<device_id>/<data_start>', method=['GET', 'OPTIONS'], name='device_data')
 def get_device_data(device_id, data_start): # -> dict[str, str, str]:
@@ -100,6 +71,7 @@ def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     rows = cur.fetchall()
     conn.close()
     return json.dumps(rows)
+
 
 @app.route('/diskspace', method=['GET', 'OPTIONS'], name='diskspace') #TippNicolas -> POST
 def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
@@ -111,6 +83,7 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
     response =  {"used_percent" : '{:,}'.format(round(used_percent)) + "%", "free" : '{:,}'.format(round(free / KB)) + " KB"}
     print(response["used_percent"] + " and " +  response["free"])
     return response
+
 
 @app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET', 'OPTIONS'], name='classification')
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
@@ -164,6 +137,40 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
     print(response)
     return response
+
+
+@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST', 'OPTIONS'], name='update')
+def update_device_ids(ts_from, ts_to, device_id):
+    try:
+        print('OKO debugging mode...')
+        conn = connect_mysql()
+        cur = conn.cursor()
+        print(conn, cur)
+        #cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
+        a = cur.execute('UPDATE data SET device = 2 WHERE timestamp > "%s" AND timestamp < "%s"', (float(ts_from), float(ts_to)))
+        print(a)
+        update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
+        print('UPDATE: size of update history now: ', len(update_history))
+        conn.close()
+        return bottle.HTTPResponse(status = 200)
+    except MySQLError as e:
+        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+    
+
+@app.route('/update_undo', method=['POST', 'OPTIONS'], name='update_undo')
+def update_undo():
+    if len(update_history) > 1 :
+        conn = connect_mysql()
+        cur = conn.cursor()
+        print('UPDATE_UNDO: clear device_id ' + update_history[-1]["device_id"] + ' from ' + update_history[-1]["ts_from"] + ' till ' + update_history[-1]["ts_to"])
+        cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+        update_history.pop() # remove last item
+        conn.close()
+        return bottle.HTTPResponse(status = 200)
+    else :
+        print('UPDATE_UNDO: not possible since no update history available')
+        return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
+
 
 if __name__ == "__main__":
     # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
