@@ -95,7 +95,7 @@ def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     json_data=[]
     print('1############################################')
     for row in rows:
-        json_data.append(dict(zip(row_headers, row)))
+        json_data.append(dict(zip(row_headers, row.values())))
         print(row)
     print('2############################################')
     print(json_data)
