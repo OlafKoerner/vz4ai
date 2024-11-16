@@ -62,17 +62,21 @@ def show_device_ids(ts_from, ts_to):
 
 @app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['GET', 'POST', 'OPTIONS'])
 def update_device_ids(ts_from, ts_to, device_id):
-    print('OKO debugging mode...')
-    conn = connect_mysql()
-    cur = conn.cursor()
-    print(conn, cur)
-    #cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
-    a = cur.execute('UPDATE data SET device = 2 WHERE timestamp > "%s" AND timestamp < "%s"', (float(ts_from), float(ts_to)))
-    print(a)
-    update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
-    print('UPDATE: size of update history now: ', len(update_history))
-    conn.close()
-    return bottle.HTTPResponse(status = 200)
+    try:
+        print('OKO debugging mode...')
+        conn = connect_mysql()
+        cur = conn.cursor()
+        print(conn, cur)
+        #cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
+        a = cur.execute('UPDATE data SET device = 2 WHERE timestamp > "%s" AND timestamp < "%s"', (float(ts_from), float(ts_to)))
+        print(a)
+        update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
+        print('UPDATE: size of update history now: ', len(update_history))
+        conn.close()
+        return bottle.HTTPResponse(status = 200)
+    except MySQLError as e:
+        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+    
 
 @app.route('/update_undo', method=['GET', 'POST', 'OPTIONS'])
 def update_undo():
