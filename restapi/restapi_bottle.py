@@ -40,7 +40,7 @@ def enable_cors():
     bottle.response.headers['Access-Control-Allow-Methods'] = _allow_methods
     bottle.response.headers['Access-Control-Allow-Headers'] = _allow_headers
 
-@app.route('/show/<ts_from>/<ts_to>', method=['GET', 'POST', 'OPTIONS'])
+@app.route('/show/<ts_from>/<ts_to>', method=['GET', 'OPTIONS'], name='show')
 def show_device_ids(ts_from, ts_to):
     conn = connect_mysql()
     cur = conn.cursor()
@@ -60,7 +60,7 @@ def show_device_ids(ts_from, ts_to):
     conn.close()
     return bottle.template(s, **d)
 
-@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['PUT', 'POST', 'OPTIONS'])
+@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST', 'OPTIONS'], name='update')
 def update_device_ids(ts_from, ts_to, device_id):
     try:
         print('OKO debugging mode...')
@@ -78,7 +78,7 @@ def update_device_ids(ts_from, ts_to, device_id):
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
     
 
-@app.route('/update_undo', method=['GET', 'POST', 'OPTIONS'])
+@app.route('/update_undo', method=['POST', 'OPTIONS'], name='update_undo')
 def update_undo():
     if len(update_history) > 1 :
         conn = connect_mysql()
@@ -92,7 +92,7 @@ def update_undo():
         print('UPDATE_UNDO: not possible since no update history available')
         return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
 
-@app.route('/device_data/<device_id>/<data_start>', method=['GET', 'POST', 'OPTIONS'])
+@app.route('/device_data/<device_id>/<data_start>', method=['GET', 'OPTIONS'], name='device_data')
 def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
@@ -101,7 +101,7 @@ def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     conn.close()
     return json.dumps(rows)
 
-@app.route('/diskspace', method=['GET', 'POST', 'OPTIONS']) #TippNicolas -> POST
+@app.route('/diskspace', method=['GET', 'OPTIONS'], name='diskspace') #TippNicolas -> POST
 def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
     KB = 1024
     MB = 1024 * KB
@@ -112,7 +112,7 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
     print(response["used_percent"] + " and " +  response["free"])
     return response
 
-@app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET', 'POST', 'OPTIONS'])
+@app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET', 'OPTIONS'], name='classification')
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
     device_list = {
         1: {'name': 'espresso-machine', 'minpow': 800},
