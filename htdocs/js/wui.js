@@ -577,6 +577,8 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 				}
 			)
+			const text = await response.text()
+			alert("DEVICE IDs: " + text);
 		} catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
 	}
 
@@ -588,6 +590,8 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
             signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
         }
 			)
+			const text = await response.text()
+			alert("UNDO: " + text);
     } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
   }
 
@@ -616,7 +620,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 				}
 			)
       const text = await response.text()
-      return text;
+      alert("Device classification: " + text);
     } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 	}
 
@@ -776,7 +780,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			undo_last_change_to_db();
 			break;
 		case 'classification':
-      read_device_classification().then( text => { alert("Device classification: " + text); });
+      read_device_classification();
 			break;
 		case 'get-time-frame':
       alert("Time frame: " + timeframe);
