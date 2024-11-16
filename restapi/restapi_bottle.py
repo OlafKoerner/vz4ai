@@ -145,10 +145,12 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         conn = connect_mysql()
         cur = conn.cursor()
         amount_written = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
+        print('written data: ', amount_written)
         conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
         update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
         print('UPDATE: size of update history now: ', len(update_history))
         amount_count = cur.execute('SELECT COUNT(device) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 1;', (float(ts_from), float(ts_to), int(device_id)))        
+        print('read data: ', amount_count)
         conn.close()
         if amount_written == amount_count:
             return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully written to database for ' + str(amount_written) + ' seconds.', status = 200)
