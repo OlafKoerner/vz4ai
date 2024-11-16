@@ -140,7 +140,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
 
 @app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST', 'OPTIONS'], name='update')
-def update_device_ids(ts_from, ts_to, device_id):
+def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     try:
         print('OKO debugging mode...')
         conn = connect_mysql()
@@ -149,6 +149,7 @@ def update_device_ids(ts_from, ts_to, device_id):
         #cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
         a = cur.execute('UPDATE data SET device = 2 WHERE timestamp > "%s" AND timestamp < "%s"', (float(ts_from), float(ts_to)))
         print(a)
+        conn.commit()
         update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
         print('UPDATE: size of update history now: ', len(update_history))
         conn.close()
@@ -158,12 +159,13 @@ def update_device_ids(ts_from, ts_to, device_id):
     
 
 @app.route('/update_undo', method=['POST', 'OPTIONS'], name='update_undo')
-def update_undo():
+def update_undo(): # -> dict[str, str]:
     if len(update_history) > 1 :
         conn = connect_mysql()
         cur = conn.cursor()
         print('UPDATE_UNDO: clear device_id ' + update_history[-1]["device_id"] + ' from ' + update_history[-1]["ts_from"] + ' till ' + update_history[-1]["ts_to"])
         cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+        conn.commit()
         update_history.pop() # remove last item
         conn.close()
         return bottle.HTTPResponse(status = 200)
