@@ -5,6 +5,7 @@ import bottle
 import pymysql
 from bottle import response, post, hook
 #from bottle_cors_plugin import cors_plugin
+import json
 import shutil
 import numpy as np # https://www.nbshare.io/notebook/505221353/ERROR-Could-not-find-a-version-that-satisfies-the-requirement-numpy==1-22-3/
 import tensorflow as tf # https://qengineering.eu/install-tensorflow-2.2.0-on-raspberry-pi-4.html
@@ -87,10 +88,14 @@ def update_undo():
 def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
-    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp > "%s" AND device & "%s" = 1 LIMIT 1000;',
-               (float(data_start), int(device_id)))
+    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp > "%s" AND device & "%s" = 1 LIMIT 1000;', (float(data_start), int(device_id)))
     rows = cur.fetchall()
-    return rows
+    row_headers=[x[0] for x in cur.description] #this will extract row headers
+    conn.close()
+    json_data=[]
+    for row in rows:
+        json_data.append(dict(zip(row_headers, row)))
+    return json.dumps(json_data)
 
 @app.route('/diskspace', method=['GET', 'POST', 'OPTIONS']) #TippNicolas -> POST
 def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
