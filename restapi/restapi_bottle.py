@@ -60,7 +60,7 @@ def show_device_ids(ts_from, ts_to):
     conn.close()
     return bottle.template(s, **d)
 
-@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['GET', 'POST', 'OPTIONS'])
+@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['PUT', 'POST', 'OPTIONS'])
 def update_device_ids(ts_from, ts_to, device_id):
     try:
         print('OKO debugging mode...')
