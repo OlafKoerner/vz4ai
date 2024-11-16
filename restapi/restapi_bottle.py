@@ -142,18 +142,18 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 @app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST', 'OPTIONS'], name='update')
 def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     try:
-        print('OKO debugging mode...')
         conn = connect_mysql()
         cur = conn.cursor()
-        print(conn, cur)
-        #cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
-        a = cur.execute('UPDATE data SET device = 2 WHERE timestamp > "%s" AND timestamp < "%s"', (float(ts_from), float(ts_to)))
-        print(a)
-        conn.commit()
+        amount_written = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(device_id), float(ts_from), float(ts_to)))
+        conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
         update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
         print('UPDATE: size of update history now: ', len(update_history))
+        amount_read = cur.execute('SELECT COUNT(device) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 1;', (float(ts_from), float(ts_to), int(device_id)))        
         conn.close()
-        return bottle.HTTPResponse(status = 200)
+        if amount_written == amount_count:
+            return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully written to database for ' + str(amount_written) + ' seconds.', status = 200)
+        else:
+            return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' could not be written to database ... please contact your SYSTEMADMIN !!!', status = 500)
     except MySQLError as e:
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
     
@@ -164,11 +164,15 @@ def update_undo(): # -> dict[str, str]:
         conn = connect_mysql()
         cur = conn.cursor()
         print('UPDATE_UNDO: clear device_id ' + update_history[-1]["device_id"] + ' from ' + update_history[-1]["ts_from"] + ' till ' + update_history[-1]["ts_to"])
-        cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+        amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp > "%s" AND timestamp < "%s" LIMIT 100000;', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
         conn.commit()
         update_history.pop() # remove last item
+        amount_count = cur.execute('SELECT COUNT(device) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), int(device_id)))        
         conn.close()
-        return bottle.HTTPResponse(status = 200)
+        if amount_written == amount_count:
+            return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully deleted from database for ' + str(amount_written) + ' seconds.', status = 200)
+        else:
+            return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' could not be deleted from database ... please contact your SYSTEMADMIN !!!', status = 500)
     else :
         print('UPDATE_UNDO: not possible since no update history available')
         return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
