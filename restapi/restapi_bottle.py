@@ -88,13 +88,20 @@ def update_undo():
 def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
-    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp > "%s" AND device & "%s" = 1 LIMIT 1000;', (float(data_start), int(device_id)))
+    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp > "%s" AND device & "%s" = 1 LIMIT 100;', (float(data_start), int(device_id)))
     rows = cur.fetchall()
     row_headers=[x[0] for x in cur.description] #this will extract row headers
     conn.close()
     json_data=[]
+    print('1############################################')
     for row in rows:
         json_data.append(dict(zip(row_headers, row)))
+        print(row)
+    print('2############################################')
+    print(json.dumps(json_data))
+    print('3############################################')
+    print(json.dumps(json_data))
+    print('4############################################')
     return json.dumps(json_data)
 
 @app.route('/diskspace', method=['GET', 'POST', 'OPTIONS']) #TippNicolas -> POST
