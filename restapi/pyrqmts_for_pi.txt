@@ -1,3 +1,4 @@
+# command: $pip install -r pyrqmts.txt
 bottle==0.12.25
 bottle-mysql==0.3.1
 gevent==22.10.2
@@ -7,6 +8,7 @@ numpy==1.21.6
 packaging==23.2
 PyMySQL==1.1.0
 PyMysqlDB==0.0.2
+json
 python-decouple==3.8
 zope.event==5.0
 zope.interface==6.1
