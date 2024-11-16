@@ -580,61 +580,44 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		} catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
 	}
 
-        /* OKO function to undo last change to database via REST API (bottle) */
-        async function undo_last_change_to_db() {  
-                try { const response = await fetch(url_rest_api + 'update_undo', { 
-                                        method: "POST",
-																				mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-                                        signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
-                                }
-                        )
-                } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
+  /* OKO function to undo last change to database via REST API (bottle) */
+  async function undo_last_change_to_db() {  
+  	try { const response = await fetch(url_rest_api + 'update_undo', { 
+          	method: "POST",
+						mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+            signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
         }
+			)
+    } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
+  }
 
-        /* OKO function to read pi disk usage via REST API (bottle) */
-        async function read_pi_disk_usage() {       
-                try 
-		{ 
-			const response = await fetch(url_rest_api + 'diskspace', { 
-					/*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-					method: "GET",
-					headers: {
-                    				'Accept': 'application/json',
-                    				'Content-Type': 'application/json'
-					},
-					//OKO not owrking for old iPhone: signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+  /* OKO function to read pi disk usage via REST API (bottle) */
+  async function read_pi_disk_usage() {       
+  	try { const response = await fetch(url_rest_api + 'diskspace', { 
+						/*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+						method: "GET",
+						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+						//OKO not working for old iPhone: signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 				}
 			)
 			const text = await response.text()
 			return text;
-                } 
-		catch(err) 
-		{ 
-			alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); 
-		} 
+    } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);} 
 	}
 
-        /* OKO function to predict device via REST API (bottle) */
-        async function read_device_classification() {
-                try
-                {
-                        var window = 20;
+  /* OKO function to predict device via REST API (bottle) */
+  async function read_device_classification() {
+  	try {
+    	var window = 20;
 			const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
-                                        /*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-                                        method: "GET",
-                                        headers: {
-                                                'Accept': 'application/json',
-                                                'Content-Type': 'application/json'
-                                        },
+      	/*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+        method: "GET",
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
 				}
 			)
-                        const text = await response.text()
-                        return text;
-                }
-                catch(err)
-                {
-                        alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);
-		}
+      const text = await response.text()
+      return text;
+    } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 	}
 
 	switch (control) {
