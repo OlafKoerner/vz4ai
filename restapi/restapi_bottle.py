@@ -84,10 +84,10 @@ def update_undo():
         return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
 
 @app.route('/device_data/<device_id>/<data_start>', method=['GET', 'POST', 'OPTIONS'])
-def get_device_data(device_id, data_start):
+def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND device & "%s" = 1 LIMIT 1000;',
+    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp > "%s" AND device & "%s" = 1 LIMIT 1000;',
                (float(data_start), int(device_id)))
     rows = cur.fetchall()
     return rows
