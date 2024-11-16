@@ -153,9 +153,9 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         print('read data: ', amount_count)
         conn.close()
         if amount_written == amount_count:
-            return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully written to database for ' + str(amount_written) + ' seconds.', status = 200)
+            return str('Device ID ' + device_id + ' successfully written to database for ' + str(amount_written) + ' seconds.')
         else:
-            return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' could not be written to database ... please contact your SYSTEMADMIN !!!', status = 500)
+            return str('Device ID ' + device_id + ' could not be written to database ... please contact your SYSTEMADMIN !!!')
     except MySQLError as e:
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
     
