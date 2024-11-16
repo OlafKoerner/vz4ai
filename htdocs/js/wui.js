@@ -572,6 +572,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	/* OKO function to write device ID to database via REST API (bottle) */
 	async function write_device_id_to_db(device_id) {	
 		try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id, { 
+					method: "POST",
 					mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
 					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 				}
@@ -582,7 +583,8 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
         /* OKO function to undo last change to database via REST API (bottle) */
         async function undo_last_change_to_db() {  
                 try { const response = await fetch(url_rest_api + 'update_undo', { 
-                                        mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+                                        method: "POST",
+																				mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
                                         signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
                                 }
                         )
@@ -595,7 +597,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		{ 
 			const response = await fetch(url_rest_api + 'diskspace', { 
 					/*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-					method: "POST",
+					method: "GET",
 					headers: {
                     				'Accept': 'application/json',
                     				'Content-Type': 'application/json'
@@ -619,7 +621,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
                         var window = 20;
 			const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
                                         /*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-                                        method: "POST",
+                                        method: "GET",
                                         headers: {
                                                 'Accept': 'application/json',
                                                 'Content-Type': 'application/json'
@@ -749,52 +751,52 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			break;
 		case 'dish-washer': 
 			var device_id = 4; 
-                        write_device_id_to_db(device_id);
+      write_device_id_to_db(device_id);
 			break;
 		case 'induction-cooker': 
 			var device_id = 8; 
-                        write_device_id_to_db(device_id);
+      write_device_id_to_db(device_id);
 			break;
 		case 'irrigation-system': 
-			var device_id = 16; 
-                       	write_device_id_to_db(device_id);                 
+			var device_id = 16;
+			write_device_id_to_db(device_id);                 
 			break;
-                case 'oven': 
-                        var device_id = 32; 
-                        write_device_id_to_db(device_id);                 
-                        break;
-                case 'microwave': 
-                        var device_id = 64; 
-                        write_device_id_to_db(device_id);                 
-                        break;
+  	case 'oven': 
+      var device_id = 32; 
+      write_device_id_to_db(device_id);                 
+      break;
+    case 'microwave': 
+      var device_id = 64; 
+      write_device_id_to_db(device_id);                 
+      break;
 		case 'kitchen-light': 
 			var device_id = 128; 
-                        write_device_id_to_db(device_id);                 
-  			break;
+      write_device_id_to_db(device_id);                 
+  		break;
 		case 'living-room-ligh': 
 			var device_id = 256; 
-                        write_device_id_to_db(device_id);                 
-  			break;
+      write_device_id_to_db(device_id);                 
+  		break;
 		case 'dining-room-light': 
 			var device_id = 512; 
-                        write_device_id_to_db(device_id);                 
-  			break;
+      write_device_id_to_db(device_id);                 
+  		break;
 		case 'ground-floor-light': 
 			var device_id = 1024; 
-                        write_device_id_to_db(device_id);                 
-  			break;
+      write_device_id_to_db(device_id);                 
+  		break;
 		case 'upper-floor-light': 
 			var device_id = 2048; 
-                        write_device_id_to_db(device_id);                 
-  			break;
+      write_device_id_to_db(device_id);                 
+  		break;
 		case 'undo-last-change':
 			undo_last_change_to_db();
 			break;
 		case 'classification':
-        		read_device_classification().then( text => { alert("Device classification: " + text); });
+      read_device_classification().then( text => { alert("Device classification: " + text); });
 			break;
 		case 'get-time-frame':
-        		alert("Time frame: " + timeframe);
+      alert("Time frame: " + timeframe);
 			break;
 	};
 };
@@ -877,7 +879,7 @@ vz.wui.refresh = function() {
                 { 
                         const response = await fetch(url_rest_api + 'diskspace', { 
                                         /*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-                                        method: "POST",
+                                        method: "GET",
                                         headers: {
                                                 'Accept': 'application/json',
                                                 'Content-Type': 'application/json'
