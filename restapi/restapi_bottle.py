@@ -149,7 +149,7 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
         update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
         print('UPDATE: size of update history now: ', len(update_history))
-        amount_count = cur.execute('SELECT COUNT(device) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 1;', (float(ts_from), float(ts_to), int(device_id)))        
+        amount_count = cur.execute('SELECT COUNT(timestamp) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 1;', (float(ts_from), float(ts_to), int(device_id)))        
         print('read data: ', amount_count)
         conn.close()
         if amount_written == amount_count:
@@ -169,7 +169,7 @@ def update_undo(): # -> dict[str, str]:
         amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp > "%s" AND timestamp < "%s";', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
         conn.commit()
         update_history.pop() # remove last item
-        amount_count = cur.execute('SELECT COUNT(device) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), int(device_id)))        
+        amount_count = cur.execute('SELECT COUNT(timestamp) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), int(device_id)))        
         conn.close()
         if amount_written == amount_count:
             return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully deleted from database for ' + str(amount_written) + ' seconds.', status = 200)
