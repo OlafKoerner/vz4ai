@@ -93,6 +93,8 @@ def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     row_headers=[x[0] for x in cur.description] #this will extract row headers
     conn.close()
     json_data=[]
+    print('0#################################')
+    print(rows)
     print('1############################################')
     for row in rows:
         json_data.append(dict(zip(row_headers, row.values())))
@@ -102,7 +104,8 @@ def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     print('3############################################')
     print(json.dumps(json_data))
     print('4############################################')
-    return json.dumps(json_data)
+    #return json.dumps(json_data)
+    return json.dumps(rows)
 
 @app.route('/diskspace', method=['GET', 'POST', 'OPTIONS']) #TippNicolas -> POST
 def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
