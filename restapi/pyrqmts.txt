@@ -1,6 +1,7 @@
 python-decouple
 gevent
 bottle
+json
 pymysqldb
 gunicorn
 numpy==1.22.3
