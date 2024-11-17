@@ -574,6 +574,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id, { 
 					method: "POST",
 					mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+					headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
 					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 				}
 			)
@@ -587,7 +588,8 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
   	try { const response = await fetch(url_rest_api + 'update_undo', { 
           	method: "POST",
 						mode: "no-cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-            signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+            headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}, /* OKO to receive text ?? */
+						signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
         }
 			)
 			const text = await response.text()
