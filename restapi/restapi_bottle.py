@@ -154,11 +154,12 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         #count amount of data points including device_id
         amount_committed = cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 1;', (float(ts_from), float(ts_to), int(device_id)))
         conn.close()
+        print(f'selected: {amount_selected}, written: {amount_written}, committed: {amount_committed}')
         #check if update was committed successfully 
         if amount_selected == amount_committed:
-            print(f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for {amount_written} of {amount_selected} data points in [s].')
+            print(f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for all {amount_selected} data points by adding {amount_written} data points.')
         else:
-            print(f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_written} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!')
+            print(f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!')
     except MySQLError as e:
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
     
