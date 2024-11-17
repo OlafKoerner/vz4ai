@@ -137,7 +137,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     return response
 
 
-@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST', 'OPTIONS'], name='update')
+@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['GET', 'POST', 'OPTIONS'], name='update')
 def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     try:
         conn = connect_mysql()
@@ -166,7 +166,7 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
     
 
-@app.route('/update_undo', method=['POST', 'OPTIONS'], name='update_undo')
+@app.route('/update_undo', method=['GET', 'POST', 'OPTIONS'], name='update_undo')
 def update_undo(): # -> dict[str, str]:
     if len(update_history) > 1 :
         conn = connect_mysql()
