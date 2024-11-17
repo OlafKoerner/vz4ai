@@ -156,9 +156,9 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         conn.close()
         #check if update was committed successfully 
         if amount_selected == amount_committed:
-            print(f'Device ID {device_id} ({device_list[device_id]["name"]}) successfully written to database for {amount_written} of {amount_selected} data points in [s].')
+            print(f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for {amount_written} of {amount_selected} data points in [s].')
         else:
-            print(f'Device ID {device_id} ({device_list[device_id]["name"]}) could not be written to database ... only {amount_written} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!')
+            print(f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_written} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!')
     except MySQLError as e:
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
     
@@ -174,10 +174,10 @@ def update_undo(): # -> dict[str, str]:
         update_history.pop() # remove last item
         amount_count = cur.execute('SELECT COUNT(timestamp) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), int(device_id)))        
         conn.close()
-        if amount_written == amount_count:
-            return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully deleted from database for ' + str(amount_written) + ' seconds.', status = 200)
-        else:
-            return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' could not be deleted from database ... please contact your SYSTEMADMIN !!!', status = 500)
+        #if amount_written == amount_count:
+        #    return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully deleted from database for ' + str(amount_written) + ' seconds.', status = 200)
+        #else:
+        #    return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' could not be deleted from database ... please contact your SYSTEMADMIN !!!', status = 500)
     else :
         print('UPDATE_UNDO: not possible since no update history available')
         return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
