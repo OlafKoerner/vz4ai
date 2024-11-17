@@ -11,12 +11,30 @@ import numpy as np # https://www.nbshare.io/notebook/505221353/ERROR-Could-not-f
 import tensorflow as tf # https://qengineering.eu/install-tensorflow-2.2.0-on-raspberry-pi-4.html
 import tensorflow.keras as keras
 
+#global settings
 config = Config(RepositoryEnv("./.env"))
-
 app = bottle.Bottle()
 #app.install(cors_plugin('*'))
-
 update_history = [{}]
+device_list = {
+        1: {'name': 'espresso-machine', 'minpow': 800},
+        2: {'name': 'washing-machine', 'minpow': 500},
+        4: {'name': 'dish-washer', 'minpow': 500},
+        8: {'name': 'induction-cooker', 'minpow': 800},
+        16: {'name': 'irrigation-system', 'minpow': 400},
+        32: {'name': 'oven', 'minpow': 800},
+        64: {'name': 'microwave', 'minpow': 800},
+        128: {'name': 'kitchen-light', 'minpow': 200},
+        256: {'name': 'living-room-light', 'minpow': 200},
+        512: {'name': 'dining-room-light', 'minpow': 200},
+        1024: {'name': 'ground-floor-light', 'minpow': 200},
+        2048: {'name': 'upper-floor-light', 'minpow': 200}}
+
+# Enable CORS
+_allow_origin = '*'
+_allow_methods = 'PUT, GET, POST, DELETE, OPTIONS'
+_allow_headers = 'Authorization, Origin, Accept, Content-Type, X-Requested-With'
+
 
 def connect_mysql() :
     # reload .env to exchange keras models on-the-fly
@@ -27,12 +45,7 @@ def connect_mysql() :
         password=config('mypassword'),
         database=config('mydatabase'),
         cursorclass=pymysql.cursors.DictCursor)
-
-# Enable CORS
-_allow_origin = '*'
-_allow_methods = 'PUT, GET, POST, DELETE, OPTIONS'
-_allow_headers = 'Authorization, Origin, Accept, Content-Type, X-Requested-With'
-
+    
 
 @app.hook('after_request') #TippNicolas
 def enable_cors():
@@ -87,21 +100,6 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
 
 @app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET', 'OPTIONS'], name='classification')
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
-    device_list = {
-        1: {'name': 'espresso-machine', 'minpow': 800},
-        2: {'name': 'washing-machine', 'minpow': 500},
-        4: {'name': 'dish-washer', 'minpow': 500},
-        8: {'name': 'induction-cooker', 'minpow': 800},
-        16: {'name': 'irrigation-system', 'minpow': 400},
-        32: {'name': 'oven', 'minpow': 800},
-        64: {'name': 'microwave', 'minpow': 800},
-        128: {'name': 'kitchen-light', 'minpow': 200},
-        256: {'name': 'living-room-light', 'minpow': 200},
-        512: {'name': 'dining-room-light', 'minpow': 200},
-        1024: {'name': 'ground-floor-light', 'minpow': 200},
-        2048: {'name': 'upper-floor-light', 'minpow': 200},
-    }
-
     conn = connect_mysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s";',
