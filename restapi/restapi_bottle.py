@@ -176,13 +176,15 @@ def update_undo(): # -> dict[str, str]:
         amount_written  = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
         conn.commit()
         update_history.pop() # remove last item
-        #amount_count = cur.execute('SELECT COUNT(timestamp) FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))        
+        amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), int(device_id)))
         conn.close()
-        #if amount_written == amount_count:
-        #    return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully deleted from database for ' + str(amount_written) + ' seconds.', status = 200)
-        #else:
-        #    return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' could not be deleted from database ... please contact your SYSTEMADMIN !!!', status = 500)
-    else :
+        if amount_selected == amount_committed:
+                response = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully removed for all {amount_selected} data points by changing {amount_written} data points.'
+        else:
+                response = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points include the device. Please contact your SYSTEMADMIN !!!'
+        print(response)
+        return json.dumps(response)
+    else:
         print('UPDATE_UNDO: not possible since no update history available')
         return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
 
