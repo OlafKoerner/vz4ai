@@ -158,9 +158,9 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         conn.close()
         #check if update was committed successfully 
         if amount_selected == amount_committed:
-            print(f'Device ID {device_id} ({device_list[device_id]['name']}) successfully written to database for {amount_written} of {amount_selected} data points in [s].')
+            print(f'Device ID {device_id} ({device_list[device_id]["name"]}) successfully written to database for {amount_written} of {amount_selected} data points in [s].')
         else:
-            print(f'Device ID {device_id} ({device_list[device_id]['name']}) could not be written to database ... only {amount_written} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!')
+            print(f'Device ID {device_id} ({device_list[device_id]["name"]}) could not be written to database ... only {amount_written} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!')
     except MySQLError as e:
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
     
