@@ -59,7 +59,7 @@ def enable_cors():
 def show_device_ids(ts_from, ts_to):
     conn = connect_mysql()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s";',
+    cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";',
                (float(ts_from), float(ts_to)))
     row = cur.fetchone()
     s = ''
@@ -80,7 +80,7 @@ def show_device_ids(ts_from, ts_to):
 def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
-    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp > "%s" AND device & "%s" = 1;', (float(data_start), int(device_id)))
+    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp >= "%s" AND device & "%s" = 1;', (float(data_start), int(device_id)))
     rows = cur.fetchall()
     conn.close()
     return json.dumps(rows)
@@ -102,7 +102,7 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s";',
+    cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";',
                (float(ts_from_str), float(ts_to_str)))
     data_list = cur.fetchall()
     conn.close()
@@ -143,16 +143,16 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         conn = connect_mysql()
         cur = conn.cursor()
         #count amount of all data points
-        amount_selected = cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s";', (float(ts_from), float(ts_to)))
+        amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp =< "%s";', (float(ts_from), float(ts_to)))
         #update data points which don't include device_id yet
-        amount_written = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp > "%s" AND timestamp < "%s";', (int(device_id), float(ts_from), float(ts_to)))
+        amount_written = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp =< "%s";', (int(device_id), float(ts_from), float(ts_to)))
         #commit update to db
         conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
         #log change for potential undo
         update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
         print('UPDATE: size of update history now: ', len(update_history))
         #count amount of data points including device_id
-        amount_committed = cur.execute('SELECT * FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))
+        amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))
         conn.close()
         print(f'selected: {amount_selected}, written: {amount_written}, committed: {amount_committed}')
         #check if update was committed successfully 
@@ -170,10 +170,11 @@ def update_undo(): # -> dict[str, str]:
         conn = connect_mysql()
         cur = conn.cursor()
         print('UPDATE_UNDO: clear device_id ' + update_history[-1]["device_id"] + ' from ' + update_history[-1]["ts_from"] + ' till ' + update_history[-1]["ts_to"])
-        amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp > "%s" AND timestamp < "%s";', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+        amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+        amount_written  = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
         conn.commit()
         update_history.pop() # remove last item
-        amount_count = cur.execute('SELECT COUNT(timestamp) FROM data WHERE timestamp > "%s" AND timestamp < "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), int(device_id)))        
+        #amount_count = cur.execute('SELECT COUNT(timestamp) FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))        
         conn.close()
         #if amount_written == amount_count:
         #    return bottle.HTTPResponse(body = 'Device ID ' + device_id + ' successfully deleted from database for ' + str(amount_written) + ' seconds.', status = 200)
