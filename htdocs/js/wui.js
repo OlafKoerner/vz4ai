@@ -578,7 +578,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 				}
 			)
-			const text = await response.json()
+			/*const text = await response.json()*/
 			/* alert("DEVICE IDs: " + text); OKO: still buggy*/
 		} catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
 	}
@@ -592,7 +592,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 						signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
         }
 			)
-			const text = await response.json()
+			/*const text = await response.json()*/
 			/* alert("UNDO: " + text); OKO: still buggy */
     } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
   }
