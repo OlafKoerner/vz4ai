@@ -178,10 +178,10 @@ def update_undo(): # -> dict[str, str]:
         amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"])))
         conn.close()
         if amount_selected == amount_committed:
-                response = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully removed for all {amount_selected} data points by changing {amount_written} data points.'
+                response = f'Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) successfully removed for all {amount_selected} data points by changing {amount_written} data points.'
                 update_history.pop() # remove last item
         else:
-                response = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points include the device. Please contact your SYSTEMADMIN !!!'
+                response = f'Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points include the device. Please contact your SYSTEMADMIN !!!'
         print(response)
         return json.dumps(response)
     else:
