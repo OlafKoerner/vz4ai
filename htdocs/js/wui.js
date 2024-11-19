@@ -579,7 +579,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 				}
 			)
 			const text = await response.json()
-			alert("DEVICE IDs: " + JSON.stringify(text));
+			alert("DEVICE IDs: " + text);
 		} catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
 	}
 
@@ -593,7 +593,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
         }
 			)
 			const text = await response.json()
-			alert("UNDO: " + JSON.stringify(text));
+			alert("UNDO: " + text);
     } catch(err) { alert(`Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
   }
 
