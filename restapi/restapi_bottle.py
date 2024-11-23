@@ -42,8 +42,8 @@ def enable_cors():
     bottle.response.headers['Access-Control-Allow-Methods'] = _allow_methods
     bottle.response.headers['Access-Control-Allow-Headers'] = _allow_headers
 
-@route('/', method = 'OPTIONS')
-@route('/<path:path>', method = 'OPTIONS')
+@app.route('/', method = 'OPTIONS')
+@app.route('/<path:path>', method = 'OPTIONS')
 def options_handler(path = None):
     return
 
