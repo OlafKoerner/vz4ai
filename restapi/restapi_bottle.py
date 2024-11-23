@@ -100,7 +100,7 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
 
 @app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET', 'OPTIONS'], name='classification')
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
-    if request.method == 'GET':
+    #if request.method == 'GET':
         conn = connect_mysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from_str), float(ts_to_str)))
