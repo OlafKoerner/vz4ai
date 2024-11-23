@@ -155,13 +155,14 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))
         conn.close()
         print(f'selected: {amount_selected}, written: {amount_written}, committed: {amount_committed}')
-        #check if update was committed successfully 
+        #check if update was committed successfully
+        response = {}
         if amount_selected == amount_committed:
-            response = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for all {amount_selected} data points by adding {amount_written} data points.'
+            response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for all {amount_selected} data points by adding {amount_written} data points.'
         else:
-            response = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!'
+            response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!'
         print(response)
-        return json.dumps(response)
+        return response
     except pymysql.Error as e:
         print('Got error {!r}, errno is {}'.format(e, e.args[0]))
     
