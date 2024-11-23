@@ -125,8 +125,8 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
         identified_devices = np.array([])
         for i in range(yy.shape[0]):
-        identified_devices = np.append(identified_devices, np.argmax(yy[i]))
-        identified_devices = np.unique(identified_devices)
+                identified_devices = np.append(identified_devices, np.argmax(yy[i]))
+                identified_devices = np.unique(identified_devices)
 
         response = {}
         for i in identified_devices:
