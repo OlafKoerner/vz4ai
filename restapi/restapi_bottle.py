@@ -35,12 +35,14 @@ _allow_origin = '*'
 _allow_methods = 'PUT, GET, POST, DELETE, OPTIONS'
 _allow_headers = 'Authorization, Origin, Accept, Content-Type, X-Requested-With'
 
+
 @app.hook('after_request') #TippNicolas
 def enable_cors():
     #Add headers to enable CORS
     bottle.response.headers['Access-Control-Allow-Origin'] = _allow_origin
     bottle.response.headers['Access-Control-Allow-Methods'] = _allow_methods
     bottle.response.headers['Access-Control-Allow-Headers'] = _allow_headers
+
 
 @app.route('/', method = 'OPTIONS')
 @app.route('/<path:path>', method = 'OPTIONS')
@@ -59,7 +61,7 @@ def connect_mysql() :
         cursorclass=pymysql.cursors.DictCursor)
     
 
-@app.route('/show/<ts_from>/<ts_to>', method=['GET', 'OPTIONS'], name='show')
+@app.route('/show/<ts_from>/<ts_to>', method=['GET'], name='show')
 def show_device_ids(ts_from, ts_to):
     conn = connect_mysql()
     cur = conn.cursor()
@@ -104,41 +106,40 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
 
 @app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET'], name='classification')
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
-    #if request.method == 'GET':
-        conn = connect_mysql()
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from_str), float(ts_to_str)))
-        data_list = cur.fetchall()
-        conn.close()
+    conn = connect_mysql()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from_str), float(ts_to_str)))
+    data_list = cur.fetchall()
+    conn.close()
 
-        x = np.array([])
-        xx = np.array([])
-        for row in data_list:
-                x = np.append(x, row['value'])
+    x = np.array([])
+    xx = np.array([])
+    for row in data_list:
+            x = np.append(x, row['value'])
 
-        window_length = int(config('keras_window_length'))
+    window_length = int(config('keras_window_length'))
 
-        i = 0 + window_length
-        while i < x.size:
-                xx = np.append(xx, x[i - window_length: i])
-                i = i + window_length
+    i = 0 + window_length
+    while i < x.size:
+            xx = np.append(xx, x[i - window_length: i])
+            i = i + window_length
 
-        xx = xx.reshape((xx.size // window_length, window_length))
-        model = keras.models.load_model(config('keras_filename'))
-        yy = model.predict(xx)
+    xx = xx.reshape((xx.size // window_length, window_length))
+    model = keras.models.load_model(config('keras_filename'))
+    yy = model.predict(xx)
 
-        identified_devices = np.array([])
-        for i in range(yy.shape[0]):
-                identified_devices = np.append(identified_devices, np.argmax(yy[i]))
-                identified_devices = np.unique(identified_devices)
+    identified_devices = np.array([])
+    for i in range(yy.shape[0]):
+            identified_devices = np.append(identified_devices, np.argmax(yy[i]))
+            identified_devices = np.unique(identified_devices)
 
-        response = {}
-        for i in identified_devices:
-                id = 2**int(i)
-                response[str(id)] = device_list[id]['name']
+    response = {}
+    for i in identified_devices:
+            id = 2**int(i)
+            response[str(id)] = device_list[id]['name']
 
-        print(response)
-        return response
+    print(response)
+    return response
 
 
 @app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST'], name='update')
