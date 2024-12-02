@@ -1,5 +1,6 @@
 import socket
 from decouple import Config, RepositoryEnv, Csv
+import logging
 from gevent import monkey; monkey.patch_all() # https://bottlepy.org/docs/dev/async.html
 import bottle
 import pymysql
@@ -13,6 +14,8 @@ import tensorflow.keras as keras
 
 #global settings
 config = Config(RepositoryEnv("./.env"))
+logging.basicConfig(level=logging.INFO, filename="restapi_bottle.log",filemode="w", format="%(asctime)s %(levelname)s %(message)s")
+logging.handlers.RotatingFileHandler(filename="restapi_bottle.log", maxBytes=1000000, backupCount=1)
 app = bottle.Bottle()
 #app.install(cors_plugin('*'))
 update_history = [{}]
@@ -88,9 +91,9 @@ def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     rows = cur.fetchall()
     conn.close()
     if bool(rows):
-        print("Data found and sent")
+        logging.info("Data found and sent")
     else:
-        print("No data found")
+        logging.info("No data found")
     return json.dumps(rows)
 
 
@@ -102,7 +105,7 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
     total, used, free = shutil.disk_usage('/')
     used_percent = used / total * 100
     response =  {"used_percent" : '{:,}'.format(round(used_percent)) + "%", "free" : '{:,}'.format(round(free / KB)) + " KB"}
-    print(response["used_percent"] + " and " +  response["free"])
+    logging.info(response["used_percent"] + " and " +  response["free"])
     return response
 
 
@@ -141,7 +144,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
                 id = 2**int(i)
                 response[str(id)] = device_list[id]['name']
 
-        print(response)
+        logging.info(response)
         return response
 
 
@@ -158,21 +161,21 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
         #log change for potential undo
         update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
-        print('UPDATE: size of update history now: ', len(update_history))
+        logging.info('UPDATE: size of update history now: ', len(update_history))
         #count amount of data points including device_id
         amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))
         conn.close()
-        print(f'selected: {amount_selected}, written: {amount_written}, committed: {amount_committed}')
+        logging.info(f'selected: {amount_selected}, written: {amount_written}, committed: {amount_committed}')
         #check if update was committed successfully
         response = {}
         if amount_selected == amount_committed:
             response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for all {amount_selected} data points by adding {amount_written} data points.'
         else:
             response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!'
-        print(response)
+        logging.info(response)
         return response
     except pymysql.Error as e:
-        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+        logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
     
 
 @app.route('/update_undo', method=['POST'], name='update_undo')
@@ -191,10 +194,10 @@ def update_undo(): # -> dict[str, str]:
                 update_history.pop() # remove last item
         else:
                 response = f'Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points include the device. Please contact your SYSTEMADMIN !!!'
-        print(response)
+        logging.info(response)
         return json.dumps(response)
     else:
-        print('UPDATE_UNDO: not possible since no update history available')
+        logging.warning('UPDATE_UNDO: not possible since no update history available')
         return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
 
 
