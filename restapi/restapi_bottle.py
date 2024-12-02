@@ -61,14 +61,20 @@ def options_handler(path = None):
 
 def connect_mysql() :
     # reload .env to exchange keras models on-the-fly
-    config.__init__(RepositoryEnv("./.env"))
-    return pymysql.connect(
-        host='localhost',
-        user=config('myuser'),
-        password=config('mypassword'),
-        database=config('mydatabase'),
-        cursorclass=pymysql.cursors.DictCursor)
-    
+    try:
+        env_file = "./.env"
+        config.__init__(RepositoryEnv(env_file))
+    except:
+        logging.error(f"environment file {env_file} not found", exc_info=True)
+    try:
+        return pymysql.connect(
+            host='localhost',
+            user=config('myuser'),
+            password=config('mypassword'),
+            database=config('mydatabase'),
+            cursorclass=pymysql.cursors.DictCursor)
+    except:
+        logging.error("could not open database at localhost", exc_info=True)    
 
 @app.route('/show/<ts_from>/<ts_to>', method=['GET', 'OPTIONS'], name='show')
 def show_device_ids(ts_from, ts_to):
@@ -119,48 +125,47 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
 
 @app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET'], name='classification')
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
-    #if request.method == 'GET':
-        conn = connect_mysql()
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from_str), float(ts_to_str)))
-        data_list = cur.fetchall()
-        conn.close()
+    conn = connect_mysql()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from_str), float(ts_to_str)))
+    data_list = cur.fetchall()
+    conn.close()
 
-        x = np.array([])
-        xx = np.array([])
-        for row in data_list:
-                x = np.append(x, row['value'])
+    x = np.array([])
+    xx = np.array([])
+    for row in data_list:
+            x = np.append(x, row['value'])
 
-        window_length = int(config('keras_window_length'))
+    window_length = int(config('keras_window_length'))
 
-        i = 0 + window_length
-        while i < x.size:
-                xx = np.append(xx, x[i - window_length: i])
-                i = i + window_length
+    i = 0 + window_length
+    while i < x.size:
+            xx = np.append(xx, x[i - window_length: i])
+            i = i + window_length
 
-        xx = xx.reshape((xx.size // window_length, window_length))
-        model = keras.models.load_model(config('keras_filename'))
-        yy = model.predict(xx)
+    xx = xx.reshape((xx.size // window_length, window_length))
+    model = keras.models.load_model(config('keras_filename'))
+    yy = model.predict(xx)
 
-        identified_devices = np.array([])
-        for i in range(yy.shape[0]):
-                identified_devices = np.append(identified_devices, np.argmax(yy[i]))
-                identified_devices = np.unique(identified_devices)
+    identified_devices = np.array([])
+    for i in range(yy.shape[0]):
+            identified_devices = np.append(identified_devices, np.argmax(yy[i]))
+            identified_devices = np.unique(identified_devices)
 
-        response = {}
-        for i in identified_devices:
-                id = 2**int(i)
-                response[str(id)] = device_list[id]['name']
+    response = {}
+    for i in identified_devices:
+            id = 2**int(i)
+            response[str(id)] = device_list[id]['name']
 
-        logging.info(response)
-        return response
+    logging.info(response)
+    return response
 
 
 @app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST'], name='update')
 def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
-    try:
         conn = connect_mysql()
         cur = conn.cursor()
+    try:
         #count amount of all data points
         amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from), float(ts_to)))
         #update data points which don't include device_id yet
@@ -210,5 +215,8 @@ def update_undo(): # -> dict[str, str]:
 
 
 if __name__ == "__main__":
-    # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
-    app.run(server='gevent', host=config('myhost'), port=config('myport'), debug=True)
+    try:
+        # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
+        app.run(server='gevent', host=config('myhost'), port=config('myport'), debug=True)
+    except:
+        logging.error(f"failed to start gevent REST server at {config('myhost') + ":" + config('myport')}", exc_info=True)
