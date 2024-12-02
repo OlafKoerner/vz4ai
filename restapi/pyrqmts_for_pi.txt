@@ -29,4 +29,4 @@ pybind11
 h5py==2.10.0
 #--upgrade setuptools
 gdown
-
+logging
