@@ -220,4 +220,4 @@ if __name__ == "__main__":
         # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
         app.run(server='gevent', host=config('myhost'), port=config('myport'), debug=True)
     except:
-        logging.error(f"failed to start gevent REST server at {config('myhost') + ":" + config('myport')}", exc_info=True)
+        logging.error(f"failed to start gevent REST server at {config('myhost') + ':' + config('myport')}", exc_info=True)
