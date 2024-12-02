@@ -1,6 +1,7 @@
 import socket
 from decouple import Config, RepositoryEnv, Csv
 import logging
+from logging.handlers import RotatingFileHandler
 from gevent import monkey; monkey.patch_all() # https://bottlepy.org/docs/dev/async.html
 import bottle
 import pymysql
