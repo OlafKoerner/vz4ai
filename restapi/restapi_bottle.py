@@ -14,15 +14,17 @@ import tensorflow.keras as keras
 
 #global settings
 config = Config(RepositoryEnv("./.env"))
+
 logging.basicConfig(
         level=logging.INFO, 
         filename="restapi_bottle.log",
         filemode="w", 
         format="%(asctime)s %(levelname)s %(message)s", 
         handlers=[RotatingFileHandler(filename="restapi_bottle.log", maxBytes=1000000, backupCount=1)])
-logging.
+
 app = bottle.Bottle()
 #app.install(cors_plugin('*'))
+
 update_history = [{}]
 device_list = {
         1: {'name': 'espresso-machine', 'minpow': 800},
