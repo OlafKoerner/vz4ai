@@ -16,10 +16,12 @@ import tensorflow.keras as keras
 #global settings
 config = Config(RepositoryEnv("./.env"))
 
+#setup logger for file and console
 logging.basicConfig(
         level=logging.INFO, 
         format="%(asctime)s %(levelname)s %(message)s", 
         handlers=[RotatingFileHandler(filename="./restapi_bottle.log", maxBytes=1000000, backupCount=1)])
+logging.getLogger().addHandler(logging.StreamHandler())
 
 app = bottle.Bottle()
 #app.install(cors_plugin('*'))
