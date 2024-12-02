@@ -20,7 +20,7 @@ config = Config(RepositoryEnv("./.env"))
 logging.basicConfig(
         level=logging.INFO, 
         format="%(asctime)s %(levelname)s %(message)s", 
-        handlers=[RotatingFileHandler(filename="./restapi_bottle.log", maxBytes=1000000, backupCount=1)])
+        handlers=[RotatingFileHandler(filename="./restapi_bottle.log", maxBytes=300000, backupCount=2)])
 logging.getLogger().addHandler(logging.StreamHandler())
 
 app = bottle.Bottle()
