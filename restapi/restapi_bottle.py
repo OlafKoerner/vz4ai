@@ -14,8 +14,13 @@ import tensorflow.keras as keras
 
 #global settings
 config = Config(RepositoryEnv("./.env"))
-logging.basicConfig(level=logging.INFO, filename="restapi_bottle.log",filemode="w", format="%(asctime)s %(levelname)s %(message)s")
-logging.handlers.RotatingFileHandler(filename="restapi_bottle.log", maxBytes=1000000, backupCount=1)
+logging.basicConfig(
+        level=logging.INFO, 
+        filename="restapi_bottle.log",
+        filemode="w", 
+        format="%(asctime)s %(levelname)s %(message)s", 
+        handlers=[RotatingFileHandler(filename="restapi_bottle.log", maxBytes=1000000, backupCount=1)])
+logging.
 app = bottle.Bottle()
 #app.install(cors_plugin('*'))
 update_history = [{}]
