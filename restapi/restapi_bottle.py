@@ -17,6 +17,7 @@ import tensorflow.keras as keras
 config = Config(RepositoryEnv("./.env"))
 
 #setup logger for file and console
+#https://blog.sentry.io/logging-in-python-a-developers-guide/
 logging.basicConfig(
         level=logging.INFO, 
         format="%(asctime)s %(levelname)s %(message)s", 
