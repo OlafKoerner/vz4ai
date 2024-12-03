@@ -101,7 +101,9 @@ def show_device_ids(ts_from, ts_to):
 def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
-    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp >= "%s" AND device & "%s" = "%s";', (float(data_start), int(device_id), int(device_id)))
+    #device & id = id too slow. alternative column for each device_id, but major reformatting of database
+    #cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp >= "%s" AND device & "%s" = "%s";', (float(data_start), int(device_id), int(device_id)))
+    cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp >= "%s" AND device = "%s";', (float(data_start), int(device_id)))
     rows = cur.fetchall()
     conn.close()
     if bool(rows):
