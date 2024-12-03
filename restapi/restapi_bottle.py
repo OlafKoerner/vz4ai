@@ -220,7 +220,7 @@ def update_undo(): # -> dict[str, str]:
 if __name__ == "__main__":
     try:
         # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
+        logging.info(f"Bottle starting GeventServer at {config('myhost') + ':' + config('myport')}")
         app.run(server='gevent', host=config('myhost'), port=config('myport'), debug=True)
-        logging.info(f"gevent REST server started at {config('myhost') + ':' + config('myport')}")
     except:
-        logging.error(f"failed to start gevent REST server at {config('myhost') + ':' + config('myport')}", exc_info=True)
+        logging.error(f"Bottle failed to start GeventServer at {config('myhost') + ':' + config('myport')}", exc_info=True)
