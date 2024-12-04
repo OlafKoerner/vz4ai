@@ -42,14 +42,6 @@ device_list = {
         1024: {'name': 'ground-floor-light', 'minpow': 200},
         2048: {'name': 'upper-floor-light', 'minpow': 200}}
 
-#create list to search efficiently for keys in db
-search_device_list = []
-for i in range(int(device_list.keys()[-1])+1):
-    for key in device_list:
-        k = int(key)
-        if i & k == k:
-            search_device_list = np.append(search_device_list, i)
-
 # Enable CORS
 _allow_origin = '*'
 _allow_methods = 'PUT, GET, POST, DELETE, OPTIONS'
@@ -113,7 +105,6 @@ def get_device_data(device_id, data_start): # -> dict[str, str, str]:
     #device & id = id too slow. alternative column for each device_id, but major reformatting of database
     #cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp >= "%s" AND device & "%s" = "%s";', (float(data_start), int(device_id), int(device_id)))
     cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp >= "%s" AND device = "%s";', (float(data_start), int(device_id)))
-    #cur.execute('SELECT timestamp, value, device FROM data WHERE timestamp >= "%s" AND device IN "%s";', (float(data_start), int(search_device_list[int(device_id))))
     rows = cur.fetchall()
     conn.close()
     if bool(rows):
