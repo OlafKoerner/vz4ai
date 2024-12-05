@@ -652,8 +652,10 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 */
 
-		const response = '{"start" : "1733372929448", "end" : "1733382679918"}'
-		vz.wui.zoom(parseInt(JSON.parse(response)).start, parseInt(JSON.parse(response)).end)
+		const response = '{"start" : "1733372929448", "end" : "1733382679918"}';
+		const response_obj = JSON.parse(response);
+		alert(response + response_obj)
+		vz.wui.zoom(parseInt(response_obj.start, response_obj.end);
 	}
 
 	switch (control) {
