@@ -640,7 +640,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	function set_time_frame(control) {
 		// # Insert a formatted date in Drafts.app using a prompt.
 		// Store selection
-		const [st, len] = editor.getSelectedRange();
+		//const [st, len] = editor.getSelectedRange();
 
 		// Create prompt
 		var p = Prompt.create();
