@@ -638,9 +638,9 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		let dt_start = prompt(button_str + control + "\n\nPlease enter start date/time (YYYY-MM-DDThh:mm:ss)\n", "2024-09-01T08:00:00");
-		let dt_end   = prompt(button_str + control + "\n\nPlease enter start date/time (YYYY-MM-DDThh:mm:ss)\n" + dt_start + "\n\nPlease enter end date/time (YYYY-MM-DDThh:mm:ss)\n", dt_start);
-		confirm('time interval froms ' + dt_start + ' till ' + dt_end + 'chosen.');
+		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", "2024-09-01T08:00:00");
+		let dt_end   = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): " + dt_start + "\nend (YYYY-MM-DDThh:mm:ss): ", dt_start);
+		confirm('from: ' + dt_start + '\ntill: ' + dt_end);
 	}
 
 	switch (control) {
