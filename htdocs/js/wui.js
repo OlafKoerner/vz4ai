@@ -566,62 +566,72 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	}
 
 	/* OKO already define REST-API url for the case that device button was pressed */
-	var url_rest_api = 'http://192.168.178.185:8082/'
+	var url_rest_api = 'http://192.168.178.185:8082/';
 	var timeframe = Math.round(vz.options.plot.xaxis.min) + '/' + Math.round(vz.options.plot.xaxis.max) + '/';
+	var button_str = 'BUTTON: ';
 
 	/* OKO function to write device ID to database via REST API (bottle) */
 	async function write_device_id_to_db(device_id, control) {	
-		try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id, { 
-					method: "POST",
-					mode: "cors",  /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-					headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
-				}
-			)
-			alert('BUTTON: ' + control + '\n' + await response.text());
-		} catch(err) { alert('BUTTON: ' + control + '\n' + 'Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &'); } 
+		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nClassify ' + control + ' to be active at timeframe ' + timeframe + ' ?\n\n') 	
+		if (write_to_db)
+		{
+			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id, { 
+						method: "POST",
+						mode: "cors",  /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+						signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+					}
+				)
+				alert(button_str + control + '\n\n' + await response.text());
+			} catch(err) { alert(button_str + control + '\n\n' + 'Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &'); } 
+		}
 	}
 
-  /* OKO function to undo last change to database via REST API (bottle) */
-  async function undo_last_change_to_db(control) {  
-  	try { const response = await fetch(url_rest_api + 'update_undo', { 
-          			method: "POST",
-					mode: "cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-            		headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}, /* OKO to receive text ?? */
-					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
-		        }
-			)
-			alert('BUTTON: ' + control + '\n' + await response.text());
-    	} catch(err) { alert(`Error calling POST undo: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
-  }
+	/* OKO function to undo last change to database via REST API (bottle) */
+	async function undo_last_change_to_db(control) {  
+		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nUndo last classification at timeframe ' + timeframe + ' ?\n\n') 	
+		if (write_to_db)
+		{
+			try { 
+					const response = await fetch(url_rest_api + 'update_undo', { 
+							method: "POST",
+							mode: "cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}, /* OKO to receive text ?? */
+							signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+						}
+					)
+					alert(button_str + control + '\n\n' + await response.text());
+			} catch(err) { alert(button_str + control + '\n\n' + 'Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &'); } 
+		}
+	}
 
-  /* OKO function to read pi disk usage via REST API (bottle) */
-  async function read_pi_disk_usage() {       
-  	try { const response = await fetch(url_rest_api + 'diskspace', { 
-						/*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+	/* OKO function to read pi disk usage via REST API (bottle) */
+	async function read_pi_disk_usage() {       
+		try { const response = await fetch(url_rest_api + 'diskspace', { 
+							mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options
+							method: "GET",
+							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+							//OKO not working for old iPhone: signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+					}
+				)
+				const text = await response.text();
+				return text;
+			} catch(err) { alert(`Error reading diskspace: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);} 
+	}
+
+	/* OKO function to predict device via REST API (bottle) */
+	async function read_device_classification(control) {
+		try {
+				var window = 20;
+				const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
+						mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
 						method: "GET",
 						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-						//OKO not working for old iPhone: signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
-				}
-			)
-			const text = await response.text();
-			return text;
-    	} catch(err) { alert(`Error calling GET diskspace: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);} 
-	}
-
-  /* OKO function to predict device via REST API (bottle) */
-  async function read_device_classification(control) {
-  	try {
-    		var window = 20;
-			const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
-      				/*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-        			method: "GET",
-        			headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-				}
-			)
-      		alert('BUTTON: ' + control + '\n▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬\n\n' + await response.text());
-    	} catch(err) { alert(`Error calling GET classification: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
-	}
+					}
+				)
+				alert(button_str + control + '\n\n' + await response.text());
+			} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
+		}
 
 	switch (control) {
 		case 'move-last':
