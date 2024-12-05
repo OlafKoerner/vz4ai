@@ -570,7 +570,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	var timeframe = Math.round(vz.options.plot.xaxis.min) + '/' + Math.round(vz.options.plot.xaxis.max) + '/';
 
 	/* OKO function to write device ID to database via REST API (bottle) */
-	async function write_device_id_to_db(device_id) {	
+	async function write_device_id_to_db(device_id, control) {	
 		try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id, { 
 					method: "POST",
 					mode: "cors",  /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
@@ -578,12 +578,12 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 				}
 			)
-			alert(await response.text());
-		} catch(err) { alert(`Error calling POST device_id_to_db: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
+			alert('BUTTON: ' + control + '\n' + await response.text());
+		} catch(err) { alert('BUTTON: ' + control + '\n' + 'Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &'); } 
 	}
 
   /* OKO function to undo last change to database via REST API (bottle) */
-  async function undo_last_change_to_db() {  
+  async function undo_last_change_to_db(control) {  
   	try { const response = await fetch(url_rest_api + 'update_undo', { 
           			method: "POST",
 					mode: "cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
@@ -591,7 +591,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 					signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 		        }
 			)
-			alert(await response.text());
+			alert('BUTTON: ' + control + '\n' + await response.text());
     	} catch(err) { alert(`Error calling POST undo: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); } 
   }
 
@@ -610,7 +610,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	}
 
   /* OKO function to predict device via REST API (bottle) */
-  async function read_device_classification() {
+  async function read_device_classification(control) {
   	try {
     		var window = 20;
 			const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
@@ -619,8 +619,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
         			headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
 				}
 			)
-      		const text = await response.text();
-      		alert("Device classification: " + text);
+      		alert('BUTTON: ' + control + '\n' + await response.text());
     	} catch(err) { alert(`Error calling GET classification: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 	}
 
@@ -730,60 +729,60 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			************************************************/
 		case 'espresso-machine': 
 			var device_id = 1;
-			write_device_id_to_db(device_id); 
+			write_device_id_to_db(device_id, control); 
 			break;
 		case 'washing-machine': 
 			var device_id = 2; 
-			write_device_id_to_db(device_id);
+			write_device_id_to_db(device_id, control);
 			break;
 		case 'dish-washer': 
 			var device_id = 4; 
-      write_device_id_to_db(device_id);
+      		write_device_id_to_db(device_id, control);
 			break;
 		case 'induction-cooker': 
 			var device_id = 8; 
-      write_device_id_to_db(device_id);
+      		write_device_id_to_db(device_id, control);
 			break;
 		case 'irrigation-system': 
 			var device_id = 16;
-			write_device_id_to_db(device_id);                 
+			write_device_id_to_db(device_id, control);                 
 			break;
-  	case 'oven': 
-      var device_id = 32; 
-      write_device_id_to_db(device_id);                 
-      break;
-    case 'microwave': 
-      var device_id = 64; 
-      write_device_id_to_db(device_id);                 
-      break;
+  		case 'oven': 
+      		var device_id = 32; 
+      		write_device_id_to_db(device_id, control);                 
+      		break;
+    	case 'microwave': 
+      		var device_id = 64; 
+      		write_device_id_to_db(device_id, control);                 
+      		break;
 		case 'kitchen-light': 
 			var device_id = 128; 
-      write_device_id_to_db(device_id);                 
-  		break;
+      		write_device_id_to_db(device_id, control);                 
+  			break;
 		case 'living-room-ligh': 
 			var device_id = 256; 
-      write_device_id_to_db(device_id);                 
-  		break;
+      		write_device_id_to_db(device_id, control);                 
+  			break;
 		case 'dining-room-light': 
 			var device_id = 512; 
-      write_device_id_to_db(device_id);                 
-  		break;
+      		write_device_id_to_db(device_id, control);                 
+  			break;
 		case 'ground-floor-light': 
 			var device_id = 1024; 
-      write_device_id_to_db(device_id);                 
-  		break;
+      		write_device_id_to_db(device_id, control);                 
+  			break;
 		case 'upper-floor-light': 
 			var device_id = 2048; 
-      write_device_id_to_db(device_id);                 
-  		break;
+      		write_device_id_to_db(device_id, control);                 
+  			break;
 		case 'undo-last-change':
-			undo_last_change_to_db();
+			undo_last_change_to_db(control);
 			break;
 		case 'classification':
-      read_device_classification();
+      		read_device_classification(control);
 			break;
 		case 'get-time-frame':
-      alert("Time frame: " + timeframe);
+      		alert("BUTTON: " + control + '\n' + timeframe);
 			break;
 	};
 };
