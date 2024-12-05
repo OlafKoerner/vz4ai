@@ -636,6 +636,48 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 			}
 		}
+		
+	function goto_datetime(control) {
+		// # Insert a formatted date in Drafts.app using a prompt.
+		// Store selection
+		const [st, len] = editor.getSelectedRange();
+
+		// Create prompt
+		var p = Prompt.create();
+
+		p.title = "Insert Formatted Date";
+
+		// Arrange the buttons in the order in which you prefer. The top button will be highlighted by default and can be selected by pressing the 'Return' key when prompted.
+		p.addButton("yyyy-MM-dd");
+		p.addButton("MMMM d, yyyy");
+		p.addButton("MM/dd/yyyy");
+		p.addButton("MM-dd-yyyy");
+		p.addButton("MM/d/yy");
+		p.addButton("MM-d-yy");
+
+		// Show prompt
+		p.show();
+
+		var b = (p.buttonPressed)
+
+		// are these two leftover from something?
+
+		var ymd = draft.processTemplate("2021-07-18") 
+		var mdy = draft.processTemplate("[[date|%B %e, %Y]]")
+
+		// if you use Date.js, you can use the prompt to as a variable for the date template (you've already done the work up there...)
+		var pd = new Date().toString(b)
+
+		// Take action
+		if (pd != undefined) {
+			// Insert processed date template into the draft at the selected range or point
+			editor.setTextInRange(st, len, pd);
+			// Reactivate the editor with the insertion point at the end of the newly added date
+			editor.setSelectedRange(st + pd.length, 0);
+		}
+
+		editor.activate();
+	}
 
 	switch (control) {
 		case 'move-last':
@@ -797,6 +839,9 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			break;
 		case 'get-time-frame':
       		alert("BUTTON: " + control + '\n' + timeframe);
+			break;
+		case 'goto_datetime':
+			goto_datetime(control)
 			break;
 	};
 };
