@@ -638,14 +638,10 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		let datetime = prompt("Please enter date and time (dd.mm.yyyy-hh:mm:ss)", "05.12.2024-02:00:00");
-		let text;
-		if (datetime == null || datetime == "") {
-  			text = "User cancelled the prompt.";
-		} else {
-  			text = "Hello " + person + "! How are you today?";
-		}
-		alert(text);
+		let dt_start = prompt("Please enter start date/time (YYYY-MM-DDThh:mm:ss)", "1997-07-16T19:20:30");
+		let dt_end = prompt("Please enter end date/time (YYYY-MM-DDThh:mm:ss)", dt_start);
+		
+		confirm('start: ' + dt_start + ', end: ' + dt_end);
 	}
 
 	switch (control) {
