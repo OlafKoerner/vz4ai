@@ -638,45 +638,13 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		// # Insert a formatted date in Drafts.app using a prompt.
-		// Store selection
-		//const [st, len] = editor.getSelectedRange();
-
-		// Create prompt
-		var p = prompt.create();
-
-		p.title = "Insert Formatted Date";
-
-		// Arrange the buttons in the order in which you prefer. The top button will be highlighted by default and can be selected by pressing the 'Return' key when prompted.
-		p.addButton("yyyy-MM-dd");
-		p.addButton("MMMM d, yyyy");
-		p.addButton("MM/dd/yyyy");
-		p.addButton("MM-dd-yyyy");
-		p.addButton("MM/d/yy");
-		p.addButton("MM-d-yy");
-
-		// Show prompt
-		p.show();
-
-		var b = (p.buttonPressed)
-
-		// are these two leftover from something?
-
-		var ymd = draft.processTemplate("2021-07-18") 
-		var mdy = draft.processTemplate("[[date|%B %e, %Y]]")
-
-		// if you use Date.js, you can use the prompt to as a variable for the date template (you've already done the work up there...)
-		var pd = new Date().toString(b)
-
-		// Take action
-		if (pd != undefined) {
-			// Insert processed date template into the draft at the selected range or point
-			//editor.setTextInRange(st, len, pd);
-			// Reactivate the editor with the insertion point at the end of the newly added date
-			//editor.setSelectedRange(st + pd.length, 0);
-		}
-
-		//editor.activate();
+		prompt({
+			title: "This is a prompt with a date input!",
+			inputType: 'date',
+			callback: function (result) {
+				console.log(result);
+			}
+		});
 	}
 
 	switch (control) {
