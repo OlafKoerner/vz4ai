@@ -619,7 +619,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
         			headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
 				}
 			)
-      		alert('BUTTON: ' + control + '\n' + await response.text());
+      		alert('<b>BUTTON: ' + control + '</b>\n' + await response.text());
     	} catch(err) { alert(`Error calling GET classification: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 	}
 
