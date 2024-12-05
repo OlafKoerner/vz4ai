@@ -638,13 +638,14 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		bootbox.prompt({
-			title: "This is a prompt with a date input!",
-			inputType: 'date',
-			callback: function (result) {
-				console.log(result);
-			}
-		});
+		let datetime = prompt("Please enter date and time (dd.mm.yyyy-hh:mm:ss)", "05.12.2024-02:00:00");
+		let text;
+		if (datetime == null || datetime == "") {
+  			text = "User cancelled the prompt.";
+		} else {
+  			text = "Hello " + person + "! How are you today?";
+		}
+		alert(text);
 	}
 
 	switch (control) {
