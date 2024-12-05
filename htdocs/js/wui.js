@@ -643,7 +643,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		//const [st, len] = editor.getSelectedRange();
 
 		// Create prompt
-		var p = Prompt.create();
+		var p = prompt.create();
 
 		p.title = "Insert Formatted Date";
 
@@ -676,7 +676,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			//editor.setSelectedRange(st + pd.length, 0);
 		}
 
-		editor.activate();
+		//editor.activate();
 	}
 
 	switch (control) {
