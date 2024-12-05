@@ -636,8 +636,8 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 			}
 		}
-		
-	function goto_datetime(control) {
+
+	function set_time_frame(control) {
 		// # Insert a formatted date in Drafts.app using a prompt.
 		// Store selection
 		const [st, len] = editor.getSelectedRange();
@@ -840,8 +840,8 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		case 'get-time-frame':
       		alert("BUTTON: " + control + '\n' + timeframe);
 			break;
-		case 'goto_datetime':
-			goto_datetime(control)
+		case 'set-time-frame':
+			set_time_frame(control)
 			break;
 	};
 };
