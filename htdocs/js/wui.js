@@ -638,7 +638,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		prompt({
+		bootbox.prompt({
 			title: "This is a prompt with a date input!",
 			inputType: 'date',
 			callback: function (result) {
