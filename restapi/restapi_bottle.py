@@ -206,16 +206,19 @@ def update_undo(): # -> dict[str, str]:
         conn.commit()
         amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"])))
         conn.close()
+        response = {}
         if amount_selected == amount_committed:
-                response = f'Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) successfully removed for all {amount_selected} data points by changing {amount_written} data points.'
+                response['status'] = f'selected == committed for Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) successfully removed for all {amount_selected} data points by changing {amount_written} data points.'
                 update_history.pop() # remove last item
         else:
-                response = f'Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points include the device. Please contact your SYSTEMADMIN !!!'
+                response['status'] = f'selected != committed for Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points include the device. Please contact your SYSTEMADMIN !!!'
         logging.info(response)
-        return json.dumps(response)
+        return response
     else:
-        logging.warning('UPDATE_UNDO: not possible since no update history available')
-        return bottle.HTTPResponse(body = 'UPDATE_UNDO: not possible since no update history available', status = 500)
+        response = {}
+        response['status'] = f'UPDATE_UNDO: not possible since no update history available'
+        logging.warning(response)
+        return response
 
 
 if __name__ == "__main__":
