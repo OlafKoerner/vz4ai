@@ -671,9 +671,9 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		// Take action
 		if (pd != undefined) {
 			// Insert processed date template into the draft at the selected range or point
-			editor.setTextInRange(st, len, pd);
+			//editor.setTextInRange(st, len, pd);
 			// Reactivate the editor with the insertion point at the end of the newly added date
-			editor.setSelectedRange(st + pd.length, 0);
+			//editor.setSelectedRange(st + pd.length, 0);
 		}
 
 		editor.activate();
