@@ -654,8 +654,8 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 		const response = '{"start" : "1733372929448", "end" : "1733382679918"}';
 		const response_obj = JSON.parse(response);
-		alert(response + response_obj)
-		vz.wui.zoom(parseInt(response_obj.start, response_obj.end);
+		alert(response + response_obj);
+		vz.wui.zoom(parseInt(response_obj.start), parseInt(response_obj.end));
 	}
 
 	switch (control) {
