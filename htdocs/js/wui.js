@@ -572,7 +572,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 	/* OKO function to write device ID to database via REST API (bottle) */
 	async function write_device_id_to_db(device_id, control) {	
-		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nClassify ' + control + ' to be active at timeframe ' + timeframe + ' ?\n\n') 	
+		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nIdentify ' + control + ' to be active at current timeframe ' + timeframe + ' ?\n\n') 	
 		if (write_to_db)
 		{
 			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id, { 
@@ -589,7 +589,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 	/* OKO function to undo last change to database via REST API (bottle) */
 	async function undo_last_change_to_db(control) {  
-		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nUndo last classification at timeframe ' + timeframe + ' ?\n\n') 	
+		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nDelete last identified device?\n\n') 	
 		if (write_to_db)
 		{
 			try { 
@@ -621,16 +621,20 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 	/* OKO function to predict device via REST API (bottle) */
 	async function read_device_classification(control) {
-		try {
-				var window = 20;
-				const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
-						mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
-						method: "GET",
-						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-					}
-				)
-				alert(button_str + control + '\n\n' + await response.text());
-			} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
+		let start_classification = confirm(button_str + 'CONFIRM CLASSIFICATION' + '\n\nStart device classification for current timeframe ' + timeframe + ' ?\n\n') 	 	
+		if (start_classification)
+		{
+			try {
+					var window = 20;
+					const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
+							mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
+							method: "GET",
+							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+						}
+					)
+					alert(button_str + control + '\n\n' + await response.text());
+				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
+			}
 		}
 
 	switch (control) {
