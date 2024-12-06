@@ -638,15 +638,15 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		let dt_now = new Date().today() + "T" + new Date().timeNow();
-		alert(dt_now);
-		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", dt_now);
+		//let dt_now = new Date().now() + "T" + new Date().timeNow();
+		//alert(dt_now);
+		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", "2024-09-01T08:00:00");
 		let dt_end   = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", dt_start);
-		//confirm('time interval from ' + dt_start + ' till ' + dt_end);
-		const ts_start = Date.parse(dt_start);
-		const ts_end   = Date.parse(dt_end);
-		alert(ts_start.toString() + ts_end.toString());
-		vz.wui.zoom(ts_start, ts_end);
+		if (confirm('time interval from ' + dt_start + ' till ' + dt_end)) {
+			const ts_start = Date.parse(dt_start);
+			const ts_end   = Date.parse(dt_end);
+			vz.wui.zoom(ts_start, ts_end);
+		}
 	}
 
 	switch (control) {
