@@ -641,21 +641,10 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", "2024-09-01T08:00:00");
 		let dt_end   = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", dt_start);
 		//confirm('time interval from ' + dt_start + ' till ' + dt_end);
-/*		try {
-			const response = await fetch(url_rest_api + 'settimeframe/' + timeframe, {
-					mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
-					method: "GET",
-					headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-				}
-			)
-			alert(button_str + control + '\n\n' + await response.text());
-		} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
-*/
-
-		const response = '{"start" : "1733372929448", "end" : "1733382679918"}';
-		const response_obj = JSON.parse(response);
-		alert(response + response_obj);
-		vz.wui.zoom(parseInt(response_obj.start), parseInt(response_obj.end));
+		const ts_start = Date.parse(dt_start);
+		const ts_end   = Date.parse(dt_end);
+		alert(toString(ts_start) + toString(ts_end));
+		vz.wui.zoom(ts_start, ts_end);
 	}
 
 	switch (control) {
