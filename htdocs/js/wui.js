@@ -638,11 +638,11 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		let ts_now = new Date();
-		alert(ts_now);
-		let dt_now = ts_now.getDate() + "T" + ts_now.getTime();
+		let dt_now = new Date();
 		alert(dt_now);
-		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", dt_now);
+		let dt_now_format = dt_now.getDate() + "T" + dt_now.getTime();
+		alert(dt_now_format);
+		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", dt_now_format);
 		let dt_end   = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", dt_start);
 		//confirm('time interval from ' + dt_start + ' till ' + dt_end);
 		const ts_start = Date.parse(dt_start);
