@@ -67,7 +67,7 @@ def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerow({
-            'log time' : datetime.datetime.now().astimezone().isoformat(), 
+            'log time' : datetime.now().astimezone().isoformat(), 
             'device id' : device_id,
             'device name' : device_list[device_id]['name'], 
             'command' : command_str,
