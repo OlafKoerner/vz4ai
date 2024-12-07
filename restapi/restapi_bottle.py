@@ -208,7 +208,7 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     response = {}
     if amount_selected == amount_committed:
         response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for all {amount_selected} data points by adding {amount_written} data points.'
-        logbook_add(device_id=int(device_id), command_str='UPDATE', ts_min=int(ts_from), ts_max=int(ts_to), status_str=response['status'])
+        logbook_add(device_id=int(device_id), command_str='UPDATE', ts_min=float(ts_from), ts_max=float(ts_to), status_str=response['status'])
     else:
         response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!'
     logging.info(response)
