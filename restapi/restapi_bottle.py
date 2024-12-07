@@ -237,6 +237,7 @@ def update_undo(): # -> dict[str, str]:
         response = {}
         if amount_selected == amount_committed:
                 response['status'] = f'selected == committed for Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) successfully removed for all {amount_selected} data points by changing {amount_written} data points.'
+                logbook_add(device_id=int(update_history[-1]["device_id"]), command_str='UNDO', ts_min=float(update_history[-1]["ts_from"]), ts_max=float(update_history[-1]["ts_to"]), status_str=response['status'])
                 update_history.pop() # remove last item
         else:
                 response['status'] = f'selected != committed for Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points include the device. Please contact your SYSTEMADMIN !!!'
