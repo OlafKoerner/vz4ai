@@ -638,9 +638,12 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		//let dt_now = new Date().now() + "T" + new Date().timeNow();
-		//alert(dt_now);
-		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", "2024-09-01T08:00:00");
+		let ts_min = new Date().now() + "T" + new Date().timeNow();
+		let ts_max = ts_min + 3600 * 1000; //1h later
+		let dt_min = ts_min.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+		//let dt_max = ts_max.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+		alert(dt_now);
+		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", dt_min);
 		let dt_end   = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", dt_start);
 		if (confirm('time interval from ' + dt_start + ' till ' + dt_end)) {
 			const ts_start = Date.parse(dt_start);
