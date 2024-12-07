@@ -84,7 +84,7 @@ def connect_mysql() :
 
 
 def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
-       
+    #https://docs.python.org/3/library/csv.html#csv.reader   
     if not os.path.exists(fname_logbook):
         with open(fname_logbook, 'w', newline='') as csvfile:           
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -99,6 +99,7 @@ def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
             'command' : command_str,
             'min timestamp' : ts_min, 
             'max timestamp' : ts_max, 
+            #https://stackoverflow.com/questions/2150739/iso-time-iso-8601-in-python
             'min datetime' : datetime.fromtimestamp(ts_min/1000).astimezone().isoformat(), 
             'max datetime' : datetime.fromtimestamp(ts_max/1000).astimezone().isoformat(), 
             'status' : status_str

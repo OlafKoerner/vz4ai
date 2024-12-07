@@ -571,6 +571,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	var button_str = 'BUTTON: ';
 
 	/* OKO function to format proper datetime */
+	// https://stackoverflow.com/questions/17415579/how-to-iso-8601-format-a-date-with-timezone-offset-in-javascript
 	function toIsoString(date) {
 		var tzo = -date.getTimezoneOffset(),
 			dif = tzo >= 0 ? '+' : '-',
