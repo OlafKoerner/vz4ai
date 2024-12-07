@@ -640,17 +640,15 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	function set_time_frame(control) {
 		let ts_max = new Date();
 		let ts_min = ts_max - 3600 * 1000; //1h earlier
-		alert(ts_max.toString())
-		//alert(ts_max.toDateString());
-		alert(ts_max.toISOString());
-		//let dt_min = ts_min.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-		//let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", dt_min);
-		//let dt_end   = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", dt_start);
-		//if (confirm('time interval from ' + dt_start + ' till ' + dt_end)) {
-		//	const ts_start = Date.parse(dt_start);
-		//	const ts_end   = Date.parse(dt_end);
-		//	vz.wui.zoom(ts_start, ts_end);
-		//}
+		//alert(ts_max.toISOString());
+		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", ts_max.toISOString());
+		let ts_end = new Date(dt_start);
+		let dt_end = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", ts_end.toISOString());
+		if (confirm('time interval from ' + dt_start + ' till ' + dt_end)) {
+			const ts_start = Date.parse(dt_start);
+			const ts_end   = Date.parse(dt_end);
+			vz.wui.zoom(ts_start, ts_end);
+		}
 	}
 
 	switch (control) {
