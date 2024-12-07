@@ -639,9 +639,10 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 	function set_time_frame(control) {
 		let ts_now = new Date();
-		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", ts_now.setHours(ts_now.getHours() + 1).toISOString());
+		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", ts_now.setHours.toISOString());
 		let ts_start = new Date(dt_start);
-		let dt_end = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", ts_start.setHours(ts_start.getHours() + 1).toISOString());
+		ts_start.setHours(ts_start.getHours() + 1);
+		let dt_end = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", ts_start.toISOString());
 		if (confirm('time interval from ' + dt_start + ' till ' + dt_end)) {
 			const ts_start = Date.parse(dt_start);
 			const ts_end   = Date.parse(dt_end);
