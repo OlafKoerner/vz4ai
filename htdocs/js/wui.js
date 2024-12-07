@@ -642,8 +642,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		let ts_min = ts_max - 3600 * 1000; //1h earlier
 		alert(ts_max.toString())
 		alert(ts_max.toDateString());
-		alert(ts_max.getUTCDate)
-		alert(ts_max.getDate)
+		alert(ts_max.toISOString)
 		//let dt_min = ts_min.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 		//let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", dt_min);
 		//let dt_end   = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", dt_start);
