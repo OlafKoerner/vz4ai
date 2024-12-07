@@ -570,6 +570,24 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	var timeframe = Math.round(vz.options.plot.xaxis.min) + '/' + Math.round(vz.options.plot.xaxis.max) + '/';
 	var button_str = 'BUTTON: ';
 
+	/* OKO function to format proper datetime */
+	function toIsoString(date) {
+		var tzo = -date.getTimezoneOffset(),
+			dif = tzo >= 0 ? '+' : '-',
+			pad = function(num) {
+				return (num < 10 ? '0' : '') + num;
+			};
+	  
+		return date.getFullYear() +
+			'-' + pad(date.getMonth() + 1) +
+			'-' + pad(date.getDate()) +
+			'T' + pad(date.getHours()) +
+			':' + pad(date.getMinutes()) +
+			':' + pad(date.getSeconds()) +
+			dif + pad(Math.floor(Math.abs(tzo) / 60)) +
+			':' + pad(Math.abs(tzo) % 60);
+	  }
+
 	/* OKO function to write device ID to database via REST API (bottle) */
 	async function write_device_id_to_db(device_id, control) {	
 		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nIdentify ' + control + ' to be active at current timeframe ' + timeframe + ' ?\n\n') 	
@@ -641,12 +659,12 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		let ts_min = new Date();
 		ts_min.setHours(ts_min.getHours() - 1)
 		//let dt_min = prompt(button_str + control + "\nStart date (YYYY-MM-DDThh:mm:ss): ", ts_min.toISOString());
-		let dt_min = prompt(button_str + control + "\nStart date (YYYY-MM-DDThh:mm:ss): ", ts_min.format("yyyy-MM-ddThh:mm:ss"));
+		let dt_min = prompt(button_str + control + "\nStart date (YYYY-MM-DDThh:mm:ss): ", toIsoString(ts_min));
 		if (dt_min){
 			ts_max = new Date(dt_min);
 			ts_max.setHours(ts_max.getHours() + 1);
 			//let dt_max = prompt(button_str + control + "\nEnd date (YYYY-MM-DDThh:mm:ss): ", ts_max.toISOString());
-			let dt_max = prompt(button_str + control + "\nEnd date (YYYY-MM-DDThh:mm:ss): ", ts_max.format("yyyy-MM-ddThh:mm:ss"));
+			let dt_max = prompt(button_str + control + "\nEnd date (YYYY-MM-DDThh:mm:ss): ", toIsoString(ts_max));
 			if (dt_max){
 				if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
 					const ts_start = Date.parse(dt_min);
