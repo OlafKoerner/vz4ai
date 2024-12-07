@@ -104,12 +104,18 @@ def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
             'status' : status_str
             })
 
-'''
+
 @app.route('/logbook', method=['GET'], name='logbook')
 def get_logbook():
     with open(fname_logbook, newline='') as csvfile:
-        spamreader = csv.reader(csvfile)
-'''
+        csvreader = csv.reader(csvfile)
+        response = {}
+        i = 0
+        for row in csvreader:
+            response[str(i)] = row
+            i = i + 1
+        return response
+
 
 @app.route('/show/<ts_from>/<ts_to>', method=['GET'], name='show')
 def show_device_ids(ts_from, ts_to):
