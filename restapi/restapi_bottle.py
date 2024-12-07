@@ -75,7 +75,7 @@ def log_measurement(device_id=0, command_str='', ts_min=0, ts_max=0, message_str
             'max timestamp' : ts_max, 
             'min datetime' : datetime.fromtimestamp(ts_min), 
             'max datetime' : datetime.fromtimestamp(ts_max), 
-            'message' : message_str]
+            'message' : message_str
             })
 
 
