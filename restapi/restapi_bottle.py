@@ -63,7 +63,7 @@ def options_handler(path = None):
 
 def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
     with open('logbook_measurements.csv', 'w', newline='') as csvfile:
-        fieldnames = ['log time', 'device ID', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
+        fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerow({
