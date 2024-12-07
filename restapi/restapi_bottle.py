@@ -8,6 +8,8 @@ import pymysql
 from bottle import response, post, hook
 #from bottle_cors_plugin import cors_plugin
 import json
+import csv
+import datetime
 import shutil
 import numpy as np # https://www.nbshare.io/notebook/505221353/ERROR-Could-not-find-a-version-that-satisfies-the-requirement-numpy==1-22-3/
 import tensorflow as tf # https://qengineering.eu/install-tensorflow-2.2.0-on-raspberry-pi-4.html
@@ -58,6 +60,23 @@ def enable_cors():
 @app.route('/<path:path>', method = 'OPTIONS')
 def options_handler(path = None):
     return
+
+def log_measurement(device_id=0, command_str='', ts_min=0, ts_max=0, message_str=''):
+    with open('logbook_measurements.csv', 'w', newline='') as csvfile:
+        fieldnames = ['log time', 'device ID', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'message']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow({
+            'log time' : datetime.datetime.now().astimezone().isoformat(), 
+            'device id' : device_id,
+            'device name' : device_list[device_id]['name'], 
+            'command' : command_str,
+            'min timestamp' : ts_min, 
+            'max timestamp' : ts_max, 
+            'min datetime' : datetime.fromtimestamp(ts_min), 
+            'max datetime' : datetime.fromtimestamp(ts_max), 
+            'message' : message_str]
+            })
 
 
 def connect_mysql() :
@@ -189,6 +208,7 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     response = {}
     if amount_selected == amount_committed:
         response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for all {amount_selected} data points by adding {amount_written} data points.'
+        add2report(response['status'])
     else:
         response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!'
     logging.info(response)
