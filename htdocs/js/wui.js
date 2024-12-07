@@ -638,15 +638,20 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 
 	function set_time_frame(control) {
-		let ts_now = new Date();
-		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", ts_now.toISOString());
-		let ts_start = new Date(dt_start);
-		ts_start.setHours(ts_start.getHours() + 1);
-		let dt_end = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", ts_start.toISOString());
-		if (confirm('time interval from ' + dt_start + ' till ' + dt_end)) {
-			const ts_start = Date.parse(dt_start);
-			const ts_end   = Date.parse(dt_end);
-			vz.wui.zoom(ts_start, ts_end);
+		let ts_min = new Date();
+		ts_min.setHours(ts_min.getHours() - 1)
+		let dt_min = prompt(button_str + control + "\nStart date (YYYY-MM-DDThh:mm:ss): ", ts_min.toISOString());
+		if (dt_min){
+			ts_max = new Date(dt_min);
+			ts_max.setHours(ts_max.getHours() + 1);
+			let dt_max = prompt(button_str + control + "\nEnd date (YYYY-MM-DDThh:mm:ss): ", ts_max.toISOString());
+			if (dt_max){
+				if (confirm('Confirm interval from\n' + dt_min + 'till\n' + dt_max)) {
+					const ts_start = Date.parse(dt_min);
+					const ts_end   = Date.parse(dt_max);
+					vz.wui.zoom(ts_start, ts_end);
+				}
+			}
 		}
 	}
 
