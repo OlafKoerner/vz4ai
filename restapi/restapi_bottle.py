@@ -8,6 +8,7 @@ import pymysql
 from bottle import response, post, hook
 #from bottle_cors_plugin import cors_plugin
 import json
+import os
 import csv
 from datetime import datetime
 import shutil
@@ -61,11 +62,18 @@ def enable_cors():
 def options_handler(path = None):
     return
 
+
 def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
-    with open('logbook_measurements.csv', 'w', newline='') as csvfile:
-        fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
+    fname_logbook = 'logbook_measurements.csv'
+    fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
+    
+    if not os.path.exists(fname_logbook):
+        with open(fname_logbook, 'w', newline='') as csvfile:           
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+    
+    with open(fname_logbook, 'a', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
         writer.writerow({
             'log time' : datetime.now().astimezone().isoformat(), 
             'device id' : device_id,
