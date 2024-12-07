@@ -642,7 +642,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		let ts_min = ts_max - 3600 * 1000; //1h earlier
 		//alert(ts_max.toISOString());
 		let dt_start = prompt(button_str + control + "\n\nstart (YYYY-MM-DDThh:mm:ss): ", ts_max.toISOString());
-		let ts_end = new Date(dt_start);
+		let ts_end = new Date(dt_start) + 3600 * 1000; //1h later;
 		let dt_end = prompt(button_str + control + "\n\nend (YYYY-MM-DDThh:mm:ss): ", ts_end.toISOString());
 		if (confirm('time interval from ' + dt_start + ' till ' + dt_end)) {
 			const ts_start = Date.parse(dt_start);
