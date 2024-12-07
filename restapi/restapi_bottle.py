@@ -18,7 +18,9 @@ import tensorflow.keras as keras
 
 #global settings
 config = Config(RepositoryEnv("./.env"))
-
+fname_logbook = 'logbook_measurements.csv'
+fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
+ 
 #setup logger for file and console
 #https://blog.sentry.io/logging-in-python-a-developers-guide/
 logging.basicConfig(
@@ -63,10 +65,26 @@ def options_handler(path = None):
     return
 
 
+def connect_mysql() :
+    # reload .env to exchange keras models on-the-fly
+    try:
+        env_file = "./.env"
+        config.__init__(RepositoryEnv(env_file))
+    except:
+        logging.error(f"environment file {env_file} not found", exc_info=True)
+    try:
+        return pymysql.connect(
+            host='localhost',
+            user=config('myuser'),
+            password=config('mypassword'),
+            database=config('mydatabase'),
+            cursorclass=pymysql.cursors.DictCursor)
+    except:
+        logging.error("could not open database at localhost", exc_info=True)    
+
+
 def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
-    fname_logbook = 'logbook_measurements.csv'
-    fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
-    
+       
     if not os.path.exists(fname_logbook):
         with open(fname_logbook, 'w', newline='') as csvfile:           
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -86,25 +104,14 @@ def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
             'status' : status_str
             })
 
+'''
+@app.route('/logbook', method=['GET'], name='logbook')
+def get_logbook():
+    with open(fname_logbook, newline='') as csvfile:
+        spamreader = csv.reader(csvfile)
+'''
 
-def connect_mysql() :
-    # reload .env to exchange keras models on-the-fly
-    try:
-        env_file = "./.env"
-        config.__init__(RepositoryEnv(env_file))
-    except:
-        logging.error(f"environment file {env_file} not found", exc_info=True)
-    try:
-        return pymysql.connect(
-            host='localhost',
-            user=config('myuser'),
-            password=config('mypassword'),
-            database=config('mydatabase'),
-            cursorclass=pymysql.cursors.DictCursor)
-    except:
-        logging.error("could not open database at localhost", exc_info=True)    
-
-@app.route('/show/<ts_from>/<ts_to>', method=['GET', 'OPTIONS'], name='show')
+@app.route('/show/<ts_from>/<ts_to>', method=['GET'], name='show')
 def show_device_ids(ts_from, ts_to):
     conn = connect_mysql()
     cur = conn.cursor()
