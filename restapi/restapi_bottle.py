@@ -73,8 +73,8 @@ def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
             'command' : command_str,
             'min timestamp' : ts_min, 
             'max timestamp' : ts_max, 
-            'min datetime' : datetime.fromtimestamp(1733603438734), 
-            'max datetime' : datetime.fromtimestamp(1733604026547), 
+            'min datetime' : datetime.fromtimestamp(ts_min/1000), 
+            'max datetime' : datetime.fromtimestamp(ts_max/1000), 
             'status' : status_str
             })
 
