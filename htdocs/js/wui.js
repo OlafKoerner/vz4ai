@@ -659,12 +659,11 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	function set_time_frame(control) {
 		let ts_min = new Date();
 		ts_min.setHours(ts_min.getHours() - 1)
-		//let dt_min = prompt(button_str + control + "\nStart date (YYYY-MM-DDThh:mm:ss): ", ts_min.toISOString());
+		//https://www.w3schools.com/js/js_popup.asp
 		let dt_min = prompt(button_str + control + "\nStart date (YYYY-MM-DDThh:mm:ss): ", toIsoString(ts_min));
 		if (dt_min){
 			ts_max = new Date(dt_min);
-			ts_max.setHours(ts_max.getHours() + 1);
-			//let dt_max = prompt(button_str + control + "\nEnd date (YYYY-MM-DDThh:mm:ss): ", ts_max.toISOString());
+			ts_max.setHours(ts_max.getHours() + 1); //https://stackoverflow.com/questions/563406/how-to-add-days-to-date
 			let dt_max = prompt(button_str + control + "\nEnd date (YYYY-MM-DDThh:mm:ss): ", toIsoString(ts_max));
 			if (dt_max){
 				if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
