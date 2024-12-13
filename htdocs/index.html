@@ -83,6 +83,14 @@
 			document.title = "Volkszaehler";
 		}
 	</script>
+<!-- OKO begin test -->
+<script src="https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/jquerycsvtotable/jquery.csvToTable.js"></script>
+	<script>
+		$(function() {
+	  	$('#CSVTable').CSVToTable('your_csv.csv');
+		});
+	</script>
+<!-- OKO end test -->
 </head>
 <body>
 <!--[if lt IE 8]>
@@ -309,5 +317,9 @@
 
 <div id="tooltip"></div>
 
+<!-- OKO begin -->
+<button onclick="showHiddenText()">Click me</button>
+<div id="CSVTable"></div>
+<!-- OKO end-->
 </body>
 </html>
