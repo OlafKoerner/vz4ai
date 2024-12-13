@@ -834,7 +834,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
       		read_device_classification(control);
 			break;
 		case 'get-time-frame':
-			alert("BUTTON: " + control + '\nfrom: ' + toIsoString(vz.options.plot.xaxis.min) + '\ntill: ' + toIsoString(vz.options.plot.xaxis.max) + '\ntimestamp frame: ' + timeframe);
+			alert("BUTTON: " + control + '\nfrom: ' + toIsoString(new Date(vz.options.plot.xaxis.min)) + '\ntill: ' + toIsoString(new Date(vz.options.plot.xaxis.max)) + '\ntimestamp frame: ' + timeframe);
 			break;
 		case 'set-time-frame':
 			set_time_frame(control)
