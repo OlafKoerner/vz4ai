@@ -18,7 +18,7 @@ import tensorflow.keras as keras
 
 #global settings
 config = Config(RepositoryEnv("./.env"))
-fname_logbook = 'logbook_measurements.csv'
+fname_logbook = '../htdocs/logbook_measurements.csv'
 fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
  
 #setup logger for file and console
