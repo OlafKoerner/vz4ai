@@ -85,11 +85,13 @@
 	</script>
 	<!-- OKO begin test -->
 	<script src="https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/jquerycsvtotable/jquery.csvToTable.js"></script>
+	<script type="text/javascript" src="js/jquery.tablesorter.dev.js"></script>
 	<script>
 		function showCSV() {
-	  	$('#CSVTable').CSVToTable('logbook_measurements.csv');
-		};
+	  	$('#CSVTable').CSVToTable('logbook_measurements.csv').bind("loadComplete",function() {$('#CSVTable').find('TABLE').tablesorter();			
+		})};
 	</script>
+	<!-- https://www.jqueryscript.net/table/jQuery-Plugin-for-Converting-CSV-TSV-To-Table-CSVToTable.html -->
 <!-- OKO end test -->
 </head>
 <body>
