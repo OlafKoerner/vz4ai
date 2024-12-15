@@ -88,7 +88,7 @@
 	<script type="text/javascript" src="js/jquery.tablesorter.dev.js"></script>
 	<script>
 		function showCSV() {
-	  	$('#CSVTable').CSVToTable('logbook_measurements.csv?v=030aj20kska2')};
+	  	$('#CSVTable').CSVToTable('logbook_measurements.csv?v=' + toString(DateTime.Now.Ticks))};
 	</script>
 	<!-- https://www.jqueryscript.net/table/jQuery-Plugin-for-Converting-CSV-TSV-To-Table-CSVToTable.html -->
 <!-- OKO end test -->
