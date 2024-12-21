@@ -228,13 +228,16 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     logging.info(f'selected: {amount_selected}, written: {amount_written}, committed: {amount_committed}')
     #check if update was committed successfully
     response = {}
+    response_short = {}
     if amount_selected == amount_committed:
         response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for all {amount_selected} data points by adding {amount_written} data points.'
+        response_short['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database.'
         logbook_add(device_id=int(device_id), command_str='UPDATE', ts_min=float(ts_from), ts_max=float(ts_to), status_str=response['status'])
     else:
         response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!'
+        response_short['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... Please contact your SYSTEMADMIN !!!'
     logging.info(response)
-    return response
+    return response_short
         
 
 @app.route('/update_undo', method=['POST'], name='update_undo')
@@ -249,14 +252,17 @@ def update_undo(): # -> dict[str, str]:
         amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"])))
         conn.close()
         response = {}
+        response_short = {}
         if amount_selected == amount_committed:
                 response['status'] = f'selected == committed for Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) successfully removed for all {amount_selected} data points by changing {amount_written} data points.'
+                response_short['status']= f'Removed Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) successfully.'
                 logbook_add(device_id=int(update_history[-1]["device_id"]), command_str='UNDO', ts_min=float(update_history[-1]["ts_from"]), ts_max=float(update_history[-1]["ts_to"]), status_str=response['status'])
                 update_history.pop() # remove last item
         else:
                 response['status'] = f'selected != committed for Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points include the device. Please contact your SYSTEMADMIN !!!'
+                response_short['status'] = f'Failed to remove Device ID {update_history[-1]["device_id"]} ({device_list[int(update_history[-1]["device_id"])]["name"]})... Please contact your SYSTEMADMIN !!!'
         logging.info(response)
-        return response
+        return response_short
     else:
         response = {}
         response['status'] = f'UPDATE_UNDO: not possible since no update history available'
