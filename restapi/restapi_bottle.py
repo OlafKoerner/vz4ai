@@ -33,6 +33,8 @@ app = bottle.Bottle()
 #app.install(cors_plugin('*'))
 
 update_history = [{}]
+remove_history = [{}]
+
 device_list = {
         1: {'name': 'espresso-machine', 'minpow': 800},
         2: {'name': 'washing-machine', 'minpow': 500},
@@ -245,12 +247,19 @@ def update_undo(): # -> dict[str, str]:
     if len(update_history) > 1 :
         conn = connect_mysql()
         cur = conn.cursor()
-        print('UPDATE_UNDO: clear device_id ' + update_history[-1]["device_id"] + ' from ' + update_history[-1]["ts_from"] + ' till ' + update_history[-1]["ts_to"])
-        amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
-        amount_written  = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
-        conn.commit()
-        amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"])))
-        conn.close()
+        try:
+            #count amount of all data points
+            amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+            #remove device id from data points
+            amount_written  = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+            #commit update to db
+            conn.commit()
+            #count amount of data points not including device_id
+            amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"])))
+            conn.close()
+        except pymysql.Error as e:
+            logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
+
         response = {}
         response_short = {}
         if amount_selected == amount_committed:
@@ -266,6 +275,78 @@ def update_undo(): # -> dict[str, str]:
     else:
         response = {}
         response['status'] = f'UPDATE_UNDO: not possible since no update history available'
+        logging.warning(response)
+        return response
+
+
+@app.route('/remove/<ts_from>/<ts_to>/<device_id>', method=['POST'], name='remove')
+def remove_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
+    conn = connect_mysql()
+    cur = conn.cursor()
+    try:
+        #count amount of all data points
+        amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from), float(ts_to)))
+        #remove device id from data points
+        amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
+        #commit update to db
+        conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
+        #log change for potential undo
+        remove_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
+        logging.info('REMOVE: size of remove history now: ', len(remove_history))
+        #count amount of data points including device_id
+        amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), int(device_id)))
+        conn.close()
+    except pymysql.Error as e:
+        logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
+
+    logging.info(f'selected: {amount_selected}, written: {amount_written}, committed: {amount_committed}')
+    #check if remove was committed successfully
+    response = {}
+    response_short = {}
+    if amount_selected == amount_committed:
+        response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully remove from database for all {amount_selected} data points by removing {amount_written} data points.'
+        response_short['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully removed from database.'
+        logbook_add(device_id=int(device_id), command_str='REMOVE', ts_min=float(ts_from), ts_max=float(ts_to), status_str=response['status'])
+    else:
+        response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... device id only removed from {amount_committed} of {amount_selected} data points. Please contact your SYSTEMADMIN !!!'
+        response_short['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be removed from database ... Please contact your SYSTEMADMIN !!!'
+    logging.info(response)
+    return response_short
+        
+
+@app.route('/remove_undo', method=['POST'], name='remove_undo')
+def remove_undo(): # -> dict[str, str]:
+    if len(remove_history) > 1 :
+        conn = connect_mysql()
+        cur = conn.cursor()
+        try:
+            #count amount of all data points
+            amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(remove_history[-1]["ts_from"]), float(remove_history[-1]["ts_to"])))
+            #re-add device id to data points
+            amount_written  = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(remove_history[-1]["device_id"]), float(remove_history[-1]["ts_from"]), float(remove_history[-1]["ts_to"])))
+            #commit update to db
+            conn.commit()
+            #count amount of data points including device_id
+            amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(remove_history[-1]["ts_from"]), float(remove_history[-1]["ts_to"]), int(remove_history[-1]["device_id"]), int(remove_history[-1]["device_id"])))
+            conn.close()
+        except pymysql.Error as e:
+            logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
+
+        response = {}
+        response_short = {}
+        if amount_selected == amount_committed:
+                response['status'] = f'selected == committed for Device ID {remove_history[-1]["device_id"]} ({device_list[int(remove_history[-1]["device_id"])]["name"]}) successfully re-added for all {amount_selected} data points by changing {amount_written} data points.'
+                response_short['status']= f'Re-added Device ID {remove_history[-1]["device_id"]} ({device_list[int(remove_history[-1]["device_id"])]["name"]}) successfully.'
+                logbook_add(device_id=int(remove_history[-1]["device_id"]), command_str='REMOVE_UNDO', ts_min=float(remove_history[-1]["ts_from"]), ts_max=float(remove_history[-1]["ts_to"]), status_str=response['status'])
+                remove_history.pop() # remove last item
+        else:
+                response['status'] = f'selected != committed for Device ID {remove_history[-1]["device_id"]} ({device_list[int(remove_history[-1]["device_id"])]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points missing the device. Please contact your SYSTEMADMIN !!!'
+                response_short['status'] = f'Failed to remove Device ID {remove_history[-1]["device_id"]} ({device_list[int(remove_history[-1]["device_id"])]["name"]})... Please contact your SYSTEMADMIN !!!'
+        logging.info(response)
+        return response_short
+    else:
+        response = {}
+        response['status'] = f'REMOVE_UNDO: not possible since no remove history available'
         logging.warning(response)
         return response
 
