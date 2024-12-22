@@ -207,7 +207,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     return response
 
 
-@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST'], name='update')
+@app.route('/update/<ts_from>/<ts_to>/<device_id>/', method=['POST'], name='update')
 def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
@@ -215,14 +215,22 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
         #count amount of all data points
         amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from), float(ts_to)))
         #update data points which don't include device_id yet
-        amount_written = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
+        if int(device_id) >= 0:
+            #add device_id to data points
+            amount_written = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
+        else:
+            #remove device_id from data points
+            amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (-int(device_id), float(ts_from), float(ts_to)))
         #commit update to db
         conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
         #log change for potential undo
         update_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
         logging.info('UPDATE: size of update history now: ', len(update_history))
         #count amount of data points including device_id
-        amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))
+        if int(device_id) >= 0:
+            amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))
+        else:
+            amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), -int(device_id)))
         conn.close()
     except pymysql.Error as e:
         logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
@@ -232,11 +240,11 @@ def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     response = {}
     response_short = {}
     if amount_selected == amount_committed:
-        response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database for all {amount_selected} data points by adding {amount_written} data points.'
+        response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully updated to database for all {amount_selected} data points by changing {amount_written} data points.'
         response_short['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully written to database.'
         logbook_add(device_id=int(device_id), command_str='UPDATE', ts_min=float(ts_from), ts_max=float(ts_to), status_str=response['status'])
     else:
-        response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the device. Please contact your SYSTEMADMIN !!!'
+        response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... only {amount_committed} of {amount_selected} data points include the changes. Please contact your SYSTEMADMIN !!!'
         response_short['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... Please contact your SYSTEMADMIN !!!'
     logging.info(response)
     return response_short
@@ -251,11 +259,17 @@ def update_undo(): # -> dict[str, str]:
             #count amount of all data points
             amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
             #remove device id from data points
-            amount_written  = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+            if int(update_history[-1]["device_id"]) >= 0:
+                amount_written  = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+            else:
+                amount_written  = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (-int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
             #commit update to db
             conn.commit()
             #count amount of data points not including device_id
-            amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"])))
+            if int(update_history[-1]["device_id"]) >= 0:
+                amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"])))
+            else:
+                amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"]), int(update_history[-1]["device_id"])))
             conn.close()
         except pymysql.Error as e:
             logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
@@ -278,7 +292,7 @@ def update_undo(): # -> dict[str, str]:
         logging.warning(response)
         return response
 
-
+'''
 @app.route('/remove/<ts_from>/<ts_to>/<device_id>', method=['POST'], name='remove')
 def remove_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     conn = connect_mysql()
@@ -349,7 +363,7 @@ def remove_undo(): # -> dict[str, str]:
         response['status'] = f'REMOVE_UNDO: not possible since no remove history available'
         logging.warning(response)
         return response
-
+'''
 
 if __name__ == "__main__":
     try:
