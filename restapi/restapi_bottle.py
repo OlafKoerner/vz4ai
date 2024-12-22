@@ -165,7 +165,7 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
     total, used, free = shutil.disk_usage('/')
     used_percent = used / total * 100
     response =  {"used_percent" : '{:,}'.format(round(used_percent)) + "%", "free" : '{:,}'.format(round(free / KB)) + " KB"}
-    logging.info(response["used_percent"] + " and " +  response["free"])
+    #logging.info(response["used_percent"] + " and " +  response["free"])
     return response
 
 
