@@ -594,7 +594,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nIdentify ' + control + ' to be active at current timeframe ' + timeframe + ' ?\n\n') 	
 		if (write_to_db)
 		{
-			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id, { 
+			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id + '/1', { 
 						method: "POST",
 						mode: "cors",  /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
 						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
