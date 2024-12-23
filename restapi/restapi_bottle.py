@@ -207,7 +207,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     return response
 
 
-@app.route('/update/<ts_from>/<ts_to>/<device_id>', method=['POST'], name='update')
+@app.route('/update/<ts_from>/<ts_to>/<int(signed=True):device_id>', method=['POST'], name='update')
 def update_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
     conn = connect_mysql()
     cur = conn.cursor()
