@@ -1,3 +1,4 @@
+#import external libs
 import socket
 from decouple import Config, RepositoryEnv, Csv
 import logging
@@ -15,6 +16,9 @@ import shutil
 import numpy as np # https://www.nbshare.io/notebook/505221353/ERROR-Could-not-find-a-version-that-satisfies-the-requirement-numpy==1-22-3/
 import tensorflow as tf # https://qengineering.eu/install-tensorflow-2.2.0-on-raspberry-pi-4.html
 import tensorflow.keras as keras
+
+#import project libs
+from PowerAIDataHandler.PowerAIDataHandler import ClassPowerAIDataHandler
 
 #global settings
 config = Config(RepositoryEnv("./.env"))
@@ -204,6 +208,19 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
             response[str(id)] = device_list[id]['name']
 
     logging.info(response)
+    return response
+
+
+@app.route('/goto_event/<device_id>/<event_id>', method=['GET'], name='goto_event')
+def get_event_timeframe(device_id_str, event_id_str):
+    if not dh:
+        try:
+            dh = ClassPowerAIDataHandler(".env")
+            dh.read_events_from_db()
+        except:
+            logging.error('Could not create ClassPowerAIDataHandler! Wrong or missing .env-file?')
+    event = dh.event_list[device_id][event_id]
+    response = {'ts_min' : event[0], 'ts_max' : event[-1]}
     return response
 
 
