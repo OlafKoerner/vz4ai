@@ -811,7 +811,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			var device_id = 128; 
       		write_device_id_to_db(device_id, control);                 
   			break;
-		case 'living-room-ligh': 
+		case 'living-room-light': 
 			var device_id = 256; 
       		write_device_id_to_db(device_id, control);                 
   			break;
