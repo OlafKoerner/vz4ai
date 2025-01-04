@@ -678,18 +678,19 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	async function goto_event(control) {
 		//https://www.w3schools.com/js/js_popup.asp
 		let device_id = prompt(button_str + control + "\nDevice ID: ", 0);
-		if (device_id){
-			let event_id = prompt(button_str + control + "\nEvent ID: ", 0);
-			
-			try {
-				const response = await fetch(url_rest_api + 'goto_event/' + device_id + '/' + event_id, {
-						mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
-						method: "GET",
-						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-					}
-				);
-				alert(button_str + control + '\n\n' + await response.text());
-			} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
+		if (device_id > 0) {
+			let event_id = prompt(button_str + control + "\nEvent ID: ", 0);			
+			if (event_id > 0) {
+				try {
+					const response = await fetch(url_rest_api + 'goto_event/' + device_id + '/' + event_id - 1, {
+							mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
+							method: "GET",
+							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+						}
+					);
+					alert(button_str + control + '\n\n' + await response.text());
+				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
+			}
 		}
 		//if (dt_min & dt_max){
 		//	if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
