@@ -682,7 +682,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			let event_id = prompt(button_str + control + "\nEvent ID: ", 0);			
 			if (event_id > 0) {
 				try {
-					const response = await fetch(url_rest_api + 'goto_event/' + device_id + '/' + event_id - 1, {
+					const response = await fetch(url_rest_api + 'goto_event/' + device_id + '/' + event_id, {
 							mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
 							method: "GET",
 							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
