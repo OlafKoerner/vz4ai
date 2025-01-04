@@ -24,7 +24,7 @@ from PowerAIDataHandler.PowerAIDataHandler import ClassPowerAIDataHandler
 config = Config(RepositoryEnv("./.env"))
 fname_logbook = '../htdocs/logbook_measurements.csv'
 fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
-dh: ClassPowerAIDataHandler = 0  #global var for instance of PowerAIDataHandler
+dh: ClassPowerAIDataHandler = NULL  #global var for instance of PowerAIDataHandler
 
 #setup logger for file and console
 #https://blog.sentry.io/logging-in-python-a-developers-guide/
