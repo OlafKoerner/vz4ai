@@ -24,7 +24,7 @@ from PowerAIDataHandler.PowerAIDataHandler import ClassPowerAIDataHandler
 config = Config(RepositoryEnv("./.env"))
 fname_logbook = '../htdocs/logbook_measurements.csv'
 fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
-dh: ClassPowerAIDataHandler = None
+dh = ClassPowerAIDataHandler(".env")
 
 #setup logger for file and console
 #https://blog.sentry.io/logging-in-python-a-developers-guide/
@@ -215,12 +215,8 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 @app.route('/goto_event/<device_id_str>/<event_id_str>', method=['GET'], name='goto_event')
 def get_event_timeframe(device_id_str, event_id_str):
     global dh
-    if not isinstance(dh, ClassPowerAIDataHandler):
-        try:
-            dh = ClassPowerAIDataHandler(".env")
-            dh.read_events_from_db()
-        except:
-            logging.error('Could not create ClassPowerAIDataHandler! Wrong or missing .env-file?')
+    dh.read_events_from_db()
+    #    logging.error('Could not create ClassPowerAIDataHandler! Wrong or missing .env-file?')
     event = dh.event_list[int(device_id_str)][0]
     response = {'ts_min' : event[0], 'ts_max' : event[-1]}
     logging.info(f'Go to timeframe: {response}')
