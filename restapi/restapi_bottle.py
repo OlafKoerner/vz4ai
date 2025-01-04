@@ -211,7 +211,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     return response
 
 
-@app.route('/goto_event/<device_id>/<event_id>', method=['GET'], name='goto_event')
+@app.route('/goto_event/<device_id_str>/<event_id_str>', method=['GET'], name='goto_event')
 def get_event_timeframe(device_id_str, event_id_str):
     if not dh:
         try:
