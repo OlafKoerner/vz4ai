@@ -215,7 +215,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 @app.route('/goto_event/<device_id_str>/<event_id_str>', method=['GET'], name='goto_event')
 def get_event_timeframe(device_id_str, event_id_str):
     global dh
-    if not isInstance(dh, ClassPowerAIDataHandler):
+    if not isinstance(dh, ClassPowerAIDataHandler):
         try:
             dh = ClassPowerAIDataHandler(".env")
             dh.read_events_from_db()
