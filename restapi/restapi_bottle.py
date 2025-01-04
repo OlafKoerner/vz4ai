@@ -24,7 +24,7 @@ from PowerAIDataHandler.PowerAIDataHandler import ClassPowerAIDataHandler
 config = Config(RepositoryEnv("./.env"))
 fname_logbook = '../htdocs/logbook_measurements.csv'
 fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
-dh = 0  #global var for instance of PowerAIDataHandler
+dh: ClassPowerAIDataHandler   #global var for instance of PowerAIDataHandler
 
 #setup logger for file and console
 #https://blog.sentry.io/logging-in-python-a-developers-guide/
@@ -215,7 +215,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 @app.route('/goto_event/<device_id_str>/<event_id_str>', method=['GET'], name='goto_event')
 def get_event_timeframe(device_id_str, event_id_str):
     global dh
-    if dh == 0:
+    if not isInstance(dh, ClassPowerAIDataHandler):
         try:
             dh = ClassPowerAIDataHandler(".env")
             dh.read_events_from_db()
