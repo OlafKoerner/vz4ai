@@ -677,9 +677,9 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 	async function goto_event(control) {
 		//https://www.w3schools.com/js/js_popup.asp
-		let device_id = prompt(button_str + control + "\nDevice ID: ", toString(0));
+		let device_id = prompt(button_str + control + "\nDevice ID: ", 0);
 		if (device_id){
-			let event_id = prompt(button_str + control + "\nEvent ID: ", toString(0));
+			let event_id = prompt(button_str + control + "\nEvent ID: ", 0);
 			
 			try {
 				const response = await fetch(url_rest_api + 'goto_event/' + device_id + '/' + event_id, {
