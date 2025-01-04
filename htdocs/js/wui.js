@@ -675,7 +675,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 	}
 
-	function goto_event(control) {
+	async function goto_event(control) {
 		//https://www.w3schools.com/js/js_popup.asp
 		let device_id = prompt(button_str + control + "\nDevice ID: ", toIsoString(0));
 		if (device_id){
