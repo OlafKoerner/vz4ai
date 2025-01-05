@@ -608,7 +608,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 	/* OKO function to delete device ID from database via REST API (bottle) */
 	async function delete_device_id_from_db(device_id, control, ts_min, ts_max) {	
-		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nDelete ' + control + ' from timeframe ' + ts_min + ' to ' + ts_max + '\n\n') 	
+		let write_to_db = true; //OKO confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nDelete ' + control + ' from timeframe ' + ts_min + ' to ' + ts_max + '\n\n') 	
 		if (write_to_db)
 		{
 			try { const response = await fetch(url_rest_api + 'update/' + ts_min + '/' + ts_max + '/' + device_id + '/' + 0, { 
