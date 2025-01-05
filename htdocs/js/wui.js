@@ -688,12 +688,9 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
 						}
 					);
-					//alert(button_str + control + '\n\n' + await response.text());
 					responseObject = JSON.parse(await response.text()); 
-					alert(responseObject.ts_min)
 					dt_min = toIsoString(new Date(responseObject.ts_min));
 					dt_max = toIsoString(new Date(responseObject.ts_max));
-					alert(dt_min)
 					if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
 						vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
 					}
