@@ -244,7 +244,7 @@ def update_device_ids(ts_from, ts_to, device_id, add): # -> dict[str, str]:
         conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
         #log change for potential undo
         update_history.append({"device_id" : device_id, "add" : add, "ts_from" : ts_from, "ts_to" : ts_to})
-        logging.info('UPDATE: size of update history now: ', len(update_history))
+        logging.info(f'UPDATE: size of update history now: {len(update_history)}')
         #count amount of data points including device_id
         if int(add) > 0:
             amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(ts_from), float(ts_to), int(device_id), int(device_id)))
