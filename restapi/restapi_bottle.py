@@ -236,10 +236,8 @@ def update_device_ids(ts_from, ts_to, device_id, add): # -> dict[str, str]:
             amount_written = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
         else:
             #remove device_id from data points
-            #OKO amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
-            amount_written = 0 #OKO debugging
-            logging.error('removal of device_id still disabled. ')
-            logging.error(f'UPDATE data SET device = device & ~{int(device_id)} WHERE timestamp >= {float(ts_from)} AND timestamp <= {float(ts_to)};')
+            amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
+            #logging.error(f'UPDATE data SET device = device & ~{int(device_id)} WHERE timestamp >= {float(ts_from)} AND timestamp <= {float(ts_to)};')
         #commit update to db
         conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
         #log change for potential undo
@@ -281,9 +279,9 @@ def update_undo(): # -> dict[str, str]:
             if int(update_history[-1]["add"]) > 0:
                 amount_written  = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
             else:
-                #OKO amount_written  = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (-int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
-                logging.error('undo of device_id still disabled. ')
-                logging.error('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (-int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+                amount_written  = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+                #logging.error('undo of device_id still disabled. ')
+                #logging.error('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
             #commit update to db
             conn.commit()
             #count amount of data points not including device_id
