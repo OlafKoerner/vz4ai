@@ -387,7 +387,7 @@ def remove_undo(): # -> dict[str, str]:
 if __name__ == "__main__":
     try:
         # 'gevent' opens many threads to handle async. alternative: 'gunicorn'
-        logging.info(f"Bottle starting GeventServer at {config('myhost') + ':' + config('myport')}")
-        app.run(server='gevent', host=config('myhost'), port=config('myport'), debug=True)
+        logging.info(f"Bottle starting GeventServer at {config('myrestapihost') + ':' + config('myrestapiport')}")
+        app.run(server='gevent', host=config('myrestapihost'), port=config('myrestapiport'), debug=True)
     except:
-        logging.error(f"Bottle failed to start GeventServer at {config('myhost') + ':' + config('myport')}", exc_info=True)
+        logging.error(f"Bottle failed to start GeventServer at {config('myrestapihost') + ':' + config('myrestapiport')}", exc_info=True)
