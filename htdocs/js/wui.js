@@ -699,6 +699,31 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		}
 	}
 
+	async function delete_event(control) {
+		//https://www.w3schools.com/js/js_popup.asp
+		let device_id = prompt(button_str + control + "\nDevice ID: ", 0);
+		if (device_id > 0) {
+			let event_id = prompt(button_str + control + "\nEvent ID: ", 0);			
+			if (event_id > 0) {
+				try {
+					const response = await fetch(url_rest_api + 'goto_event/' + device_id + '/' + event_id, {
+							mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
+							method: "GET",
+							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+						}
+					);
+					responseObject = JSON.parse(await response.text()); 
+					dt_min = toIsoString(new Date(responseObject.ts_min));
+					dt_max = toIsoString(new Date(responseObject.ts_max));
+					vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
+					if (confirm('ATTTENTION: Confirm DELETION of EVENT from\n' + dt_min + '\ntill\n' + dt_max + ' with Device ID: + device_id ???' )) {
+						//write_device_id_to_db(device_id, control) --> needs to be expanded for deletens, eg. add = 0 or 1
+					}
+				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
+			}
+		}
+	}
+
 	switch (control) {
 		case 'move-last':
 			startOfPeriodLocale = vz.wui.period == 'week' ? 'isoweek' : vz.wui.period;
