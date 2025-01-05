@@ -891,6 +891,9 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 		case 'goto-event':
 			goto_event(control)
 			break;
+		case 'delete-event':
+			delete_event(control)
+			break;
 	};
 };
 
