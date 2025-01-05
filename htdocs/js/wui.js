@@ -590,11 +590,28 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	  }
 
 	/* OKO function to write device ID to database via REST API (bottle) */
-	async function write_device_id_to_db(device_id, control, add) {	
-		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nIdentify ' + control + ' to be active at current timeframe ' + timeframe + '\n\n') 	
+	async function write_device_id_to_db(device_id, control) {	
+		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nSet Device ID ' + control + ' to active for current timeframe ' + timeframe + '\n\n') 	
 		if (write_to_db)
 		{
-			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id + '/' + add, { 
+			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id + '/1', { 
+						method: "POST",
+						mode: "cors",  /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+						signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+					}
+				)
+				alert(button_str + control + '\n\n' + await response.text());
+			} catch(err) { alert(button_str + control + '\n\n' + 'Error: ${err.name}, ${err.message}.\nMysql not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &'); } 
+		}
+	}
+
+	/* OKO function to delete device ID from database via REST API (bottle) */
+	async function delete_device_id_from_db(device_id, control, ts_min, ts_max) {	
+		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nDelete ' + control + ' from timeframe ' + ts_min + ' to ' + ts_max + '\n\n') 	
+		if (write_to_db)
+		{
+			try { const response = await fetch(url_rest_api + 'update/' + ts_min + '/' + ts_max + '/' + device_id + '/' + 0, { 
 						method: "POST",
 						mode: "cors",  /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
 						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
@@ -717,7 +734,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 					dt_max = toIsoString(new Date(responseObject.ts_max));
 					vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
 					if (confirm('ATTTENTION: Confirm DELETION of EVENT from\n' + dt_min + '\ntill\n' + dt_max + ' with Device ID: ' + device_id)) {
-						write_device_id_to_db(device_id, control, 0) //0 enables deletion of device_id from timeframe
+						delete_device_id_from_db(device_id, control, responseObject.ts_min, responseObject.ts_max)
 					}
 				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 			}
@@ -830,51 +847,51 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			************************************************/
 		case 'espresso-machine': 
 			var device_id = 1;
-			write_device_id_to_db(device_id, control, 1); 
+			write_device_id_to_db(device_id, control); 
 			break;
 		case 'washing-machine': 
 			var device_id = 2; 
-			write_device_id_to_db(device_id, control, 1);
+			write_device_id_to_db(device_id, control);
 			break;
 		case 'dish-washer': 
 			var device_id = 4; 
-      		write_device_id_to_db(device_id, control, 1);
+      		write_device_id_to_db(device_id, control);
 			break;
 		case 'induction-cooker': 
 			var device_id = 8; 
-      		write_device_id_to_db(device_id, control, 1);
+      		write_device_id_to_db(device_id, control);
 			break;
 		case 'irrigation-system': 
 			var device_id = 16;
-			write_device_id_to_db(device_id, control, 1);                 
+			write_device_id_to_db(device_id, control);                 
 			break;
   		case 'oven': 
       		var device_id = 32; 
-      		write_device_id_to_db(device_id, control, 1);                 
+      		write_device_id_to_db(device_id, control);                 
       		break;
     	case 'microwave': 
       		var device_id = 64; 
-      		write_device_id_to_db(device_id, control, 1);                 
+      		write_device_id_to_db(device_id, control);                 
       		break;
 		case 'kitchen-light': 
 			var device_id = 128; 
-      		write_device_id_to_db(device_id, control, 1);                 
+      		write_device_id_to_db(device_id, control);                 
   			break;
 		case 'living-room-light': 
 			var device_id = 256; 
-      		write_device_id_to_db(device_id, control, 1);                 
+      		write_device_id_to_db(device_id, control);                 
   			break;
 		case 'dining-room-light': 
 			var device_id = 512; 
-      		write_device_id_to_db(device_id, control, 1);                 
+      		write_device_id_to_db(device_id, control);                 
   			break;
 		case 'ground-floor-light': 
 			var device_id = 1024; 
-      		write_device_id_to_db(device_id, control, 1);                 
+      		write_device_id_to_db(device_id, control);                 
   			break;
 		case 'upper-floor-light': 
 			var device_id = 2048; 
-      		write_device_id_to_db(device_id, control, 1);                 
+      		write_device_id_to_db(device_id, control);                 
   			break;
 		case 'undo-last-change':
 			undo_last_change_to_db(control);
