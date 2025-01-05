@@ -218,7 +218,7 @@ def get_event_timeframe(device_id_str, event_id_str):
     dh.read_events_from_db()
     #    logging.error('Could not create ClassPowerAIDataHandler! Wrong or missing .env-file?')
     event = dh.event_list[int(device_id_str)][0]
-    response = {'ts_min' : event[0], 'ts_max' : event[-1]}
+    response = {'ts_min' : event['value'][0], 'ts_max' : event['value'][-1]}
     logging.info(f'Go to timeframe: {response}')
     return response
 
