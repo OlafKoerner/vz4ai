@@ -590,11 +590,11 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	  }
 
 	/* OKO function to write device ID to database via REST API (bottle) */
-	async function write_device_id_to_db(device_id, control) {	
+	async function write_device_id_to_db(device_id, control, add) {	
 		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nIdentify ' + control + ' to be active at current timeframe ' + timeframe + ' ?\n\n') 	
 		if (write_to_db)
 		{
-			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id + '/1', { 
+			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id + '/' + add, { 
 						method: "POST",
 						mode: "cors",  /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
 						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
@@ -717,7 +717,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 					dt_max = toIsoString(new Date(responseObject.ts_max));
 					vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
 					if (confirm('ATTTENTION: Confirm DELETION of EVENT from\n' + dt_min + '\ntill\n' + dt_max + ' with Device ID: + device_id ???' )) {
-						//write_device_id_to_db(device_id, control) --> needs to be expanded for deletens, eg. add = 0 or 1
+						write_device_id_to_db(device_id, control, 0) //0 enables deletion of device_id from timeframe
 					}
 				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 			}
@@ -830,51 +830,51 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			************************************************/
 		case 'espresso-machine': 
 			var device_id = 1;
-			write_device_id_to_db(device_id, control); 
+			write_device_id_to_db(device_id, control, 1); 
 			break;
 		case 'washing-machine': 
 			var device_id = 2; 
-			write_device_id_to_db(device_id, control);
+			write_device_id_to_db(device_id, control, 1);
 			break;
 		case 'dish-washer': 
 			var device_id = 4; 
-      		write_device_id_to_db(device_id, control);
+      		write_device_id_to_db(device_id, control, 1);
 			break;
 		case 'induction-cooker': 
 			var device_id = 8; 
-      		write_device_id_to_db(device_id, control);
+      		write_device_id_to_db(device_id, control, 1);
 			break;
 		case 'irrigation-system': 
 			var device_id = 16;
-			write_device_id_to_db(device_id, control);                 
+			write_device_id_to_db(device_id, control, 1);                 
 			break;
   		case 'oven': 
       		var device_id = 32; 
-      		write_device_id_to_db(device_id, control);                 
+      		write_device_id_to_db(device_id, control, 1);                 
       		break;
     	case 'microwave': 
       		var device_id = 64; 
-      		write_device_id_to_db(device_id, control);                 
+      		write_device_id_to_db(device_id, control, 1);                 
       		break;
 		case 'kitchen-light': 
 			var device_id = 128; 
-      		write_device_id_to_db(device_id, control);                 
+      		write_device_id_to_db(device_id, control, 1);                 
   			break;
 		case 'living-room-light': 
 			var device_id = 256; 
-      		write_device_id_to_db(device_id, control);                 
+      		write_device_id_to_db(device_id, control, 1);                 
   			break;
 		case 'dining-room-light': 
 			var device_id = 512; 
-      		write_device_id_to_db(device_id, control);                 
+      		write_device_id_to_db(device_id, control, 1);                 
   			break;
 		case 'ground-floor-light': 
 			var device_id = 1024; 
-      		write_device_id_to_db(device_id, control);                 
+      		write_device_id_to_db(device_id, control, 1);                 
   			break;
 		case 'upper-floor-light': 
 			var device_id = 2048; 
-      		write_device_id_to_db(device_id, control);                 
+      		write_device_id_to_db(device_id, control, 1);                 
   			break;
 		case 'undo-last-change':
 			undo_last_change_to_db(control);
