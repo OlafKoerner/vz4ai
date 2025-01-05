@@ -692,13 +692,12 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 			}
 		}
-		//if (dt_min & dt_max){
-		//	if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
-		//		const ts_start = Date.parse(dt_min);
-		//		const ts_end   = Date.parse(dt_max);
-		//		vz.wui.zoom(ts_start, ts_end);
-		//	}
-		//}
+		responseObject = JSON.parse(response); 
+		dt_min = toIsoString(responseObject.ts_min);
+		dt_max = toIsoString(responseObject.ts_max);
+		if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
+			vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
+		}
 	}
 
 	switch (control) {
