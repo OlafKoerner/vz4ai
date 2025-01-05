@@ -591,7 +591,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 	/* OKO function to write device ID to database via REST API (bottle) */
 	async function write_device_id_to_db(device_id, control, add) {	
-		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nIdentify ' + control + ' to be active at current timeframe ' + timeframe + ' ?\n\n') 	
+		let write_to_db = confirm(button_str + 'CONFIRM DATABASE CHANGES' + '\n\nIdentify ' + control + ' to be active at current timeframe ' + timeframe + '\n\n') 	
 		if (write_to_db)
 		{
 			try { const response = await fetch(url_rest_api + 'update/' + timeframe + device_id + '/' + add, { 
@@ -716,7 +716,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 					dt_min = toIsoString(new Date(responseObject.ts_min));
 					dt_max = toIsoString(new Date(responseObject.ts_max));
 					vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
-					if (confirm('ATTTENTION: Confirm DELETION of EVENT from\n' + dt_min + '\ntill\n' + dt_max + ' with Device ID: + device_id ???' )) {
+					if (confirm('ATTTENTION: Confirm DELETION of EVENT from\n' + dt_min + '\ntill\n' + dt_max + ' with Device ID: ' + device_id)) {
 						write_device_id_to_db(device_id, control, 0) //0 enables deletion of device_id from timeframe
 					}
 				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
