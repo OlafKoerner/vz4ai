@@ -236,7 +236,7 @@ def update_device_ids(ts_from, ts_to, device_id, add): # -> dict[str, str]:
             amount_written = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
         else:
             #remove device_id from data points
-            #amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
+            #OKO amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
             amount_written = 0 #OKO debugging
             logging.error('removal of device_id still disabled. ')
             logging.info('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
@@ -281,7 +281,9 @@ def update_undo(): # -> dict[str, str]:
             if int(update_history[-1]["add"]) > 0:
                 amount_written  = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
             else:
-                amount_written  = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (-int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+                #OKO amount_written  = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (-int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
+                logging.error('undo of device_id still disabled. ')
+                logging.info('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (-int(update_history[-1]["device_id"]), float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"])))
             #commit update to db
             conn.commit()
             #count amount of data points not including device_id
