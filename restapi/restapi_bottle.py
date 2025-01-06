@@ -223,7 +223,7 @@ def get_devices():
     return response
 
 
-app.route('/get_events_for_device/<device_id_str>', method=['GET'], name='get_events_for_device')
+@app.route('/get_events_for_device/<device_id_str>', method=['GET'], name='get_events_for_device')
 def get_events_for_device(device_id_str):
     global dh
     response = ''
