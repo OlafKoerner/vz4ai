@@ -693,27 +693,39 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	}
 
 	async function goto_event(control) {
-		//https://www.w3schools.com/js/js_popup.asp
-		let device_id = prompt(button_str + control + "\nDevice ID: ", 0);
-		if (device_id > 0) {
-			let event_id = prompt(button_str + control + "\nEvent ID: ", 0);			
-			if (event_id > 0) {
-				try {
-					const response = await fetch(url_rest_api + 'goto_event/' + device_id + '/' + event_id, {
+		try {
+			const response1 = await fetch(url_rest_api + 'get_devices', {
+					mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
+					method: "GET",
+					headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+				}
+			);
+			let device_list_str = await response1.text(); 
+			let device_id = prompt(button_str + control + "\n" + device_list_str + "\nChoose Device ID: ", 0); //https://www.w3schools.com/js/js_popup.asp
+			if (device_id > 0) {
+				const response2 = await fetch(url_rest_api + 'get_events_for_device/' + device_id, {
+					mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
+					method: "GET",
+					headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+				};
+				let events_list_str = await response2.text()
+				let event_id = prompt(button_str + control + "\n" + events_list_str + "Choose Event ID: ", 0);			
+				if (event_id > 0) {				
+					const response3 = await fetch(url_rest_api + 'goto_event/' + device_id + '/' + event_id, {
 							mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
 							method: "GET",
 							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
 						}
 					);
-					responseObject = JSON.parse(await response.text()); 
+					responseObject = JSON.parse(await response3.text()); 
 					dt_min = toIsoString(new Date(responseObject.ts_min));
 					dt_max = toIsoString(new Date(responseObject.ts_max));
 					if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
 						vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
-					}
-				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
+					}				
+				}
 			}
-		}
+		} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
 	}
 
 	async function delete_event(control) {
