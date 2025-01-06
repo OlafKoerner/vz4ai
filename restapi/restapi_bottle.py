@@ -230,7 +230,7 @@ def get_events_for_device(device_id_str):
     for i in range(len(dh.event_list[int(device_id_str)])):
         from_str = datetime.fromtimestamp(dh.event_list[int(device_id_str)][i]['timestamp'][0]/1000).strftime('%Y-%m-%d %H:%M:%S')
         to_str = datetime.fromtimestamp(dh.event_list[int(device_id_str)][i]['timestamp'][-1]/1000).strftime('%Y-%m-%d %H:%M:%S')
-        response = response + (str(i + 1) + ' : ' + from_str + ' - ' + to_str + '\n')
+        response = response + (str(i + 1) + ' : ' + from_str + ' till ' + to_str + '\n')
     return response
 
 
