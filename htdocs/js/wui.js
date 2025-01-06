@@ -704,10 +704,11 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			let device_id = prompt(button_str + control + "\n" + device_list_str + "\nChoose Device ID: ", 0); //https://www.w3schools.com/js/js_popup.asp
 			if (device_id > 0) {
 				const response2 = await fetch(url_rest_api + 'get_events_for_device/' + device_id, {
-					mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
-					method: "GET",
-					headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-				};
+						mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
+						method: "GET",
+						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+					}
+				);
 				let events_list_str = await response2.text()
 				let event_id = prompt(button_str + control + "\n" + events_list_str + "Choose Event ID: ", 0);			
 				if (event_id > 0) {				
