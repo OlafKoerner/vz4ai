@@ -24,7 +24,9 @@ from PowerAIDataHandler.PowerAIDataHandler import ClassPowerAIDataHandler
 config = Config(RepositoryEnv("./.env"))
 fname_logbook = '../htdocs/logbook_measurements.csv'
 fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
+#initial event list
 dh = ClassPowerAIDataHandler(".env")
+dh.read_events_from_db()
 
 #setup logger for file and console
 #https://blog.sentry.io/logging-in-python-a-developers-guide/
@@ -212,11 +214,29 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     return response
 
 
+@app.route('/get_devices', method=['GET'], name='get_devices')
+def get_devices():
+    global dh
+    response = ''
+    for device_id in dh.device_list:
+        response = response + str(device_id) + ' : ' + dh.device_list[device_id]['name'] + '\n' 
+    return response
+
+
+app.route('/get_events_for_device/<device_id_str>', method=['GET'], name='get_events_for_device')
+def get_events_for_device(device_id_str):
+    global dh
+    response = ''
+    for i in range(len(dh.event_list[int(device_id_str)])):
+        from_str = datetime.strptime(datetime.fromtimestamp(dh.event_list[int(device_id_str)][i]['timestamp'][0]), '%Y-%m-%d %H:%M:%S')
+        to_str = datetime.strptime(datetime.fromtimestamp(dh.event_list[int(device_id_str)][i]['timestamp'][-1]), '%Y-%m-%d %H:%M:%S')
+        response = response + (str(i + 1) + ' : ' + from_str + ' - ' + to_str + '\n')
+    return response
+
+
 @app.route('/goto_event/<device_id_str>/<event_id_str>', method=['GET'], name='goto_event')
 def get_event_timeframe(device_id_str, event_id_str):
     global dh
-    dh.read_events_from_db()
-    #    logging.error('Could not create ClassPowerAIDataHandler! Wrong or missing .env-file?')
     event = dh.event_list[int(device_id_str)][int(event_id_str)-1]
     response = {'ts_min' : event['timestamp'][0], 'ts_max' : event['timestamp'][-1]}
     logging.info(f'Go to timeframe: {response}')
@@ -249,6 +269,9 @@ def update_device_ids(ts_from, ts_to, device_id, add): # -> dict[str, str]:
         else:
             amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), -int(device_id)))
         conn.close()
+        #update event list
+        global dh
+        dh.read_events_from_db()
     except pymysql.Error as e:
         logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
 
@@ -290,6 +313,9 @@ def update_undo(): # -> dict[str, str]:
             else:
                 amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(update_history[-1]["ts_from"]), float(update_history[-1]["ts_to"]), int(update_history[-1]["device_id"]), int(update_history[-1]["device_id"])))
             conn.close()
+            #update event list
+            global dh
+            dh.read_events_from_db()
         except pymysql.Error as e:
             logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
 
