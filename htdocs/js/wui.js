@@ -719,11 +719,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 						}
 					);
 					responseObject = JSON.parse(await response3.text()); 
-					dt_min = toIsoString(new Date(responseObject.ts_min));
-					dt_max = toIsoString(new Date(responseObject.ts_max));
-					if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
-						vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
-					}				
+					vz.wui.zoom(responseObject.ts_min, responseObject.ts_max);
 				}
 			}
 		} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
