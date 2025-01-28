@@ -683,11 +683,9 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 			ts_max.setHours(ts_max.getHours() + 1); //https://stackoverflow.com/questions/563406/how-to-add-days-to-date
 			let dt_max = prompt(button_str + control + "\nEnd date (YYYY-MM-DDThh:mm:ss): ", toIsoString(ts_max));
 			if (dt_max){
-				if (confirm('Confirm interval from\n' + dt_min + '\ntill\n' + dt_max)) {
-					const ts_start = Date.parse(dt_min);
-					const ts_end   = Date.parse(dt_max);
-					vz.wui.zoom(ts_start, ts_end);
-				}
+				const ts_start = Date.parse(dt_min);
+				const ts_end   = Date.parse(dt_max);
+				vz.wui.zoom(ts_start, ts_end);			
 			}
 		}
 	}
