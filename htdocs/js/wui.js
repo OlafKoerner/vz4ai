@@ -615,7 +615,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 						method: "POST",
 						mode: "cors",  /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
 						headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-						signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+						signal: AbortSignal.timeout(30000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 					}
 				)
 				alert(button_str + control + '\n\n' + await response.text());
@@ -633,7 +633,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 							method: "POST",
 							mode: "cors", /* https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
 							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}, /* OKO to receive text ?? */
-							signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+							signal: AbortSignal.timeout(30000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
 						}
 					)
 					alert(button_str + control + '\n\n' + await response.text());
