@@ -242,7 +242,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     for row in data_list:
             x = np.append(x, row['value'])
 
-    window_length = int(config('cnn_window_length'))
+    window_length = int(config('cnn_window_length', cast=int))
 
     i = 0 + window_length
     while i < x.size:
@@ -252,9 +252,9 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     xx = xx.reshape((xx.size // window_length, window_length))
 
     #same z-normalization as for training 
-    xx = (xx - config('cnn_data_mean')/config('cnn_data_std'))
+    xx = (xx - config('cnn_data_mean', cast=int)/config('cnn_data_std', cast=int))
 
-    cnn_model = create_cnn_model(config('cnn_filename'), window_length, config('cnn_num_classes'))
+    cnn_model = create_cnn_model(config('cnn_filename'), window_length, config('cnn_num_classes', cast=int))
     #model = keras.models.load_model(config('keras_filename'))
     yy = cnn_model.predict(xx)
 
