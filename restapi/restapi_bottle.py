@@ -262,7 +262,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     #same z-normalization as for training 
     mean = config('cnn_data_mean', cast=float)
     std = config('cnn_data_std', cast=float)
-    xx = (xx - mean / std)
+    xx = ((xx - mean) / std)
 
     logging.info(f'xx after z-norm with mean={mean} and std={std}:\n{xx}')
 
