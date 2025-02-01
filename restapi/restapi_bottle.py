@@ -319,7 +319,7 @@ def algo_prediction(x):
             y[i] = kitchen
 
     #Auswertung
-    unique, counts = numpy.unique(y, return_counts=True)
+    unique, counts = np.unique(y, return_counts=True)
     distribution = dict(zip(unique, counts))
     prediction = max(distribution, key=distribution.get)
     return f'Algo prediction: {prediction}\n{distribution}\n'
