@@ -257,12 +257,14 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     xx = xx.reshape((xx.size // window_length, window_length))
 
     
-    logging.info(f'xx: {xx}')
+    logging.info(f'xx:\n{xx}')
 
     #same z-normalization as for training 
-    xx = (xx - config('cnn_data_mean', cast=float) / config('cnn_data_std', cast=float))
+    mean = config('cnn_data_mean', cast=float)
+    std = config('cnn_data_std', cast=float)
+    xx = (xx - mean / std)
 
-    logging.info(f'xx after z-norm: {xx}')
+    logging.info(f'xx after z-norm with mean={mean} and std={std}:\n{xx}')
 
     cnn_model = create_cnn_model(config('cnn_filename'), window_length, config('cnn_num_classes', cast=int))
     #model = keras.models.load_model(config('keras_filename'))
