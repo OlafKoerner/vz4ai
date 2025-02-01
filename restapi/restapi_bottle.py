@@ -166,6 +166,8 @@ def create_cnn_model(fname_cnn_model, window_length,  num_classes):
         #with h5py.File(fname_cnn_model, 'r') as f:
         #    load_weights_from_hdf5_group(f['model_weights'], cnn_model.layers)
     
+    cnn_model.summary()
+
     return cnn_model
 
 
@@ -253,7 +255,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     xx = xx.reshape((xx.size // window_length, window_length))
 
     #same z-normalization as for training 
-    xx = (xx - config('cnn_data_mean', cast=float)/config('cnn_data_std', cast=float))
+    xx = (xx - config('cnn_data_mean', cast=float) / config('cnn_data_std', cast=float))
 
     cnn_model = create_cnn_model(config('cnn_filename'), window_length, config('cnn_num_classes', cast=int))
     #model = keras.models.load_model(config('keras_filename'))
