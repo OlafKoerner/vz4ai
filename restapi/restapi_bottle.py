@@ -243,7 +243,7 @@ def algo_prediction(x):
             y[i] = dish
 
     #Programm zur Erkennung von induction-cooker
-    y = np.zeros(len(test_x['value']))
+    #y = np.zeros(len(test_x['value']))
     induction = 8
     start_induction = False
     for i in range(len(test_x['value']) - 600):
@@ -256,7 +256,7 @@ def algo_prediction(x):
             y[i] = induction
 
     #Programm zur Erkennung von oven
-    y = np.zeros(len(test_x['value']))
+    #y = np.zeros(len(test_x['value']))
     oven = 32
     start_oven = False
     for i in range(len(test_x['value']) - 600):
@@ -403,7 +403,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
             x = np.append(x, row['value'])
     logging.info(f'read {x} power values from db')
     
-    response = f'Algo prediction: {algo_prediction(x)}\n'
+    response = f'{algo_prediction(x)}\n'
 
     #fill power values in batches with window_length. cut left over values
     window_length = int(config('cnn_window_length', cast=int))
