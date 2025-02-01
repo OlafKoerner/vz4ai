@@ -271,7 +271,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     yy = cnn_model.predict(xx)
 
     #identify the classified devices
-    device_ids_order = np.array(config('cnn_device_ids_order', cast=Csv()))
+    device_ids_order = np.array(int(config('cnn_device_ids_order', cast=Csv())))
     
     device_probability = np.zeros(len(device_ids_order))
     for i in range(yy.shape[0]):
@@ -283,7 +283,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
     response = {}
     for d in range(len(device_ids_order)):
-        response[str(device_ids_order[d])] = f'{round(device_probability[d]*100)}% {device_list[str(device_ids_order[d])]["name"]}'
+        response[device_ids_order[d]] = f'{round(device_probability[d]*100)}% {device_list[device_ids_order[d]]["name"]}'
 
     logging.info(response)
     return response
