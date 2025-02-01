@@ -16,6 +16,7 @@ import shutil
 import numpy as np # https://www.nbshare.io/notebook/505221353/ERROR-Could-not-find-a-version-that-satisfies-the-requirement-numpy==1-22-3/
 import tensorflow as tf # https://qengineering.eu/install-tensorflow-2.2.0-on-raspberry-pi-4.html
 import tensorflow.keras as keras
+import h5py
 
 #import project libs
 from PowerAIDataHandler.PowerAIDataHandler import ClassPowerAIDataHandler
@@ -24,6 +25,8 @@ from PowerAIDataHandler.PowerAIDataHandler import ClassPowerAIDataHandler
 config = Config(RepositoryEnv("./.env"))
 fname_logbook = '../htdocs/logbook_measurements.csv'
 fieldnames = ['log time', 'device id', 'device name', 'command', 'min timestamp', 'max timestamp', 'min datetime', 'max datetime', 'status']
+global cnn_model
+
 #initial event list
 dh = ClassPowerAIDataHandler(".env")
 dh.read_events_from_db()
@@ -115,6 +118,56 @@ def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
             })
 
 
+def create_cnn_model(fname_cnn_model, window_length):
+    input_layer = keras.layers.Input(shape=(window_length, 1), num_classes)
+
+    conv1 = keras.layers.Conv1D(filters=32, kernel_size=2, strides=1, padding="same")(input_layer)
+    conv1 = keras.layers.BatchNormalization()(conv1)
+    conv1 = keras.layers.ReLU()(conv1)
+
+    maxp1 = keras.layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(conv1)
+
+    conv2 = keras.layers.Conv1D(filters=64, kernel_size=2, strides=1, padding="same")(maxp1)
+    conv2 = keras.layers.BatchNormalization()(conv2)
+    conv2 = keras.layers.ReLU()(conv2)
+
+    maxp2 = keras.layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(conv2)
+
+    conv3 = keras.layers.Conv1D(filters=128, kernel_size=2, strides=1, padding="same")(maxp2)
+    conv3 = keras.layers.BatchNormalization()(conv3)
+    conv3 = keras.layers.ReLU()(conv3)
+
+    maxp3 = keras.layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(conv3)
+
+    conv4 = keras.layers.Conv1D(filters=256, kernel_size=2, strides=1, padding="same")(maxp3)
+    conv4 = keras.layers.BatchNormalization()(conv4)
+    conv4 = keras.layers.ReLU()(conv4)
+
+    maxp4 = keras.layers.MaxPooling1D(pool_size=2, strides=2, padding='same')(conv4)
+
+    gap = keras.layers.GlobalAveragePooling1D()(maxp4)
+
+    output_layer = keras.layers.Dense(num_classes, activation="softmax")(gap)
+
+    cnn_model = keras.models.Model(inputs=input_layer, outputs=output_layer)
+
+    # Kompilieren des Modells
+    cnn_model.compile(
+        optimizer=keras.optimizers.Adam(lr=0.0001),
+        loss="sparse_categorical_crossentropy",
+        metrics=["sparse_categorical_accuracy"],
+    )
+
+    # load cnn model from file
+    if fname_cnn_model.find(".keras"):
+        cnn_model = keras.models.load_model(.keras)
+    elif fname_cnn_model.find(".h5"):
+        with h5py.File(fname_cnn_model, 'r') as f:
+            load_weights_from_hdf5_group(f['model_weights'], cnn_model.layers)
+    
+    return cnn_model
+
+
 @app.route('/logbook', method=['GET'], name='logbook')
 def get_logbook():
     with open(fname_logbook, newline='') as csvfile:
@@ -189,7 +242,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     for row in data_list:
             x = np.append(x, row['value'])
 
-    window_length = int(config('keras_window_length'))
+    window_length = int(config('cnn_window_length'))
 
     i = 0 + window_length
     while i < x.size:
@@ -197,8 +250,13 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
             i = i + window_length
 
     xx = xx.reshape((xx.size // window_length, window_length))
-    model = keras.models.load_model(config('keras_filename'))
-    yy = model.predict(xx)
+
+    #same z-normalization as for training 
+    xx = (xx - config('cnn_data_mean')/config('cnn_data_std'))
+
+    cnn_model = create_cnn_model(config('cnn_filename'), window_length)
+    #model = keras.models.load_model(config('keras_filename'))
+    yy = cnn_model.predict(xx)
 
     identified_devices = np.array([])
     for i in range(yy.shape[0]):
