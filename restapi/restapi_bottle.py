@@ -281,9 +281,9 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
     logging.info(device_ids_order)
 
-    response = {}
+    response = f'CNN detected: {device_list[device_ids_order[np.argmax(device_probability)]]["name"]}\n'
     for d in range(len(device_ids_order)):
-        response[str(device_ids_order[d])] = f'{round(device_probability[d]*100)}% {device_list[device_ids_order[d]]["name"]}'
+        response = response + f'{round(device_probability[d]*100)}% {device_list[device_ids_order[d]]["name"]}'
 
     logging.info(response)
     return response
