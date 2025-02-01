@@ -252,7 +252,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     xx = xx.reshape((xx.size // window_length, window_length))
 
     #same z-normalization as for training 
-    xx = (xx - config('cnn_data_mean', cast=int)/config('cnn_data_std', cast=int))
+    xx = (xx - config('cnn_data_mean', cast=float)/config('cnn_data_std', cast=float))
 
     cnn_model = create_cnn_model(config('cnn_filename'), window_length, config('cnn_num_classes', cast=int))
     #model = keras.models.load_model(config('keras_filename'))
