@@ -234,49 +234,43 @@ def get_remaining_disk_space(): # -> dict[str, str]: #TippNicolas "->"
 
 @app.route('/classification/<ts_from_str>/<ts_to_str>/<window_length_str>', method=['GET'], name='classification')
 def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict[str, str]:
+    
+    #read rows from db
     conn = connect_mysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from_str), float(ts_to_str)))
     data_list = cur.fetchall()
     conn.close()
 
+    #copy power values from rows
     x = np.array([])
     xx = np.array([])
     for row in data_list:
             x = np.append(x, row['value'])
-
+    logging.info(f'read {x} power values from db')
+    
+    #fill power values in batches with window_length. cut left over values
     window_length = int(config('cnn_window_length', cast=int))
-
     i = 0 + window_length
     while i < x.size:
             xx = np.append(xx, x[i - window_length: i])
             i = i + window_length
-
-   
-
     xx = xx.reshape((xx.size // window_length, window_length))
-
-    
-    logging.info(f'xx:\n{xx}')
+    logging.info(f'shape of power value array: {xx.shape}')
 
     #same z-normalization as for training 
     mean = config('cnn_data_mean', cast=float)
     std = config('cnn_data_std', cast=float)
     xx = ((xx - mean) / std)
+    logging.info(f'z-normalized power values with mean={mean} and std={std}')
 
-    logging.info(f'xx after z-norm with mean={mean} and std={std}:\n{xx}')
-
+    #load cnn model
     cnn_model = create_cnn_model(config('cnn_filename'), window_length, config('cnn_num_classes', cast=int))
-    #model = keras.models.load_model(config('keras_filename'))
+    
+    #predict active devices
     yy = cnn_model.predict(xx)
 
-    
-    logging.info(f'xx.shape: {xx.shape}')
-    logging.info(f'yy.shape: {yy.shape}')
-
-
-    logging.info(f'yy = {yy}')
-
+    #device_ids_order: [  1.   2.   4.  32. 256.]
     identified_devices = np.array([])
     for i in range(yy.shape[0]):
         identified_devices = np.append(identified_devices, np.argmax(yy[i]))
