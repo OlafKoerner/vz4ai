@@ -259,15 +259,20 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     #model = keras.models.load_model(config('keras_filename'))
     yy = cnn_model.predict(xx)
 
+    logging.info(f'y = {yy}')
+
     identified_devices = np.array([])
     for i in range(yy.shape[0]):
-            identified_devices = np.append(identified_devices, np.argmax(yy[i]))
-            identified_devices = np.unique(identified_devices)
+        identified_devices = np.append(identified_devices, np.argmax(yy[i]))
+    identified_devices = np.unique(identified_devices)
+
+    logging.info(f'identified_devices = {identified_devices}')
+
 
     response = {}
     for i in identified_devices:
-            id = 2**int(i)
-            response[str(id)] = device_list[id]['name']
+        id = 2**int(i)
+        response[str(id)] = device_list[id]['name']
 
     logging.info(response)
     return response
