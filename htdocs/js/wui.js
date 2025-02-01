@@ -657,8 +657,8 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 
 	/* OKO function to predict device via REST API (bottle) */
 	async function read_device_classification(control) {
-		let start_classification = confirm(button_str + 'CONFIRM CLASSIFICATION' + '\n\nStart device classification for current timeframe ' + timeframe + ' ?\n\n') 	 	
-		if (start_classification)
+		//let start_classification = confirm(button_str + 'CONFIRM CLASSIFICATION' + '\n\nStart device classification for current timeframe ' + timeframe + ' ?\n\n') 	 	
+		//if (start_classification)
 		{
 			try {
 					var window = 20;
