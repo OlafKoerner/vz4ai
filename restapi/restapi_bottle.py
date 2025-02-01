@@ -318,7 +318,11 @@ def algo_prediction(x):
         if start_kitchen == True:
             y[i] = kitchen
 
-    return y
+    #Auswertung
+    unique, counts = numpy.unique(y, return_counts=True)
+    distribution = dict(zip(unique, counts))
+    prediction = max(distribution, key=distribution.get)
+    return f'Algo prediction: {prediction}\n{distribution}\n'
 
 
 @app.route('/logbook', method=['GET'], name='logbook')
