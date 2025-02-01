@@ -280,7 +280,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     device_probability = device_probability / yy.shape[0]
 
     response = {}
-    for d in range(len(identified_devices)):
+    for d in range(len(device_ids_order)):
         response[str(device_ids_order[d])] = f'{round(device_probability[d]*100)}% {device_list[device_ids_order[d]]["name"]}'
 
 
