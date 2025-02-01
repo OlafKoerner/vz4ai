@@ -281,19 +281,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
     response = {}
     for d in range(len(device_ids_order)):
-        #response[str(device_ids_order[d])] = f'{round(device_probability[d]*100)}% {device_list[device_ids_order[d]]["name"]}'
-        response[str(device_ids_order[d])] = f'{round(device_probability[d]*100)}%'
-
-
-    #identified_devices = np.array([])
-    #for i in range(yy.shape[0]):
-    #    identified_devices = np.append(identified_devices, np.argmax(yy[i]))
-    #identified_devices = np.unique(identified_devices)
-    #logging.info(f'identified_devices = {identified_devices}')
-    #response = {}
-    #for i in identified_devices:
-    #    id = 2**int(i)
-    #    response[str(id)] = device_list[id]['name']
+        response[str(device_ids_order[d])] = f'{round(device_probability[d]*100)}% {device_list[str(device_ids_order[d])]["name"]}'
 
     logging.info(response)
     return response
