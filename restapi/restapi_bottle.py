@@ -119,7 +119,7 @@ def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
 
 
 def create_cnn_model(fname_cnn_model, window_length,  num_classes):
-    input_layer = keras.layers.Input(shape=(window_length, 1), 5)
+    input_layer = keras.layers.Input(shape=(window_length, 1))
 
     conv1 = keras.layers.Conv1D(filters=32, kernel_size=2, strides=1, padding="same")(input_layer)
     conv1 = keras.layers.BatchNormalization()(conv1)
