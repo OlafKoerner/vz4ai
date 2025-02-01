@@ -118,7 +118,7 @@ def logbook_add(device_id=0, command_str='', ts_min=0, ts_max=0, status_str=''):
             })
 
 
-def create_cnn_model(fname_cnn_model, window_length):
+def create_cnn_model(fname_cnn_model, window_length, num_classes):
     input_layer = keras.layers.Input(shape=(window_length, 1), num_classes)
 
     conv1 = keras.layers.Conv1D(filters=32, kernel_size=2, strides=1, padding="same")(input_layer)
@@ -254,7 +254,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     #same z-normalization as for training 
     xx = (xx - config('cnn_data_mean')/config('cnn_data_std'))
 
-    cnn_model = create_cnn_model(config('cnn_filename'), window_length)
+    cnn_model = create_cnn_model(config('cnn_filename'), window_length, config('cnn_num_classes'))
     #model = keras.models.load_model(config('keras_filename'))
     yy = cnn_model.predict(xx)
 
