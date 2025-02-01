@@ -159,9 +159,9 @@ def create_cnn_model(fname_cnn_model, window_length,  num_classes):
     )
 
     # load cnn model from file
-    if fname_cnn_model.find(".keras"):
+    if fname_cnn_model.find(".keras") != -1:
         cnn_model = keras.models.load_model(fname_cnn_model)
-    elif fname_cnn_model.find(".h5"):
+    elif fname_cnn_model.find(".h5") != -1:
         cnn_model.load_weights(fname_cnn_model)
         #with h5py.File(fname_cnn_model, 'r') as f:
         #    load_weights_from_hdf5_group(f['model_weights'], cnn_model.layers)
