@@ -270,19 +270,28 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     #predict active devices
     yy = cnn_model.predict(xx)
 
-    #device_ids_order: [  1.   2.   4.  32. 256.]
-    identified_devices = np.array([])
+    #identify the classified devices
+    device_ids_order = np.array(config('cnn_device_ids_order', cast=Csv()))
+    
     for i in range(yy.shape[0]):
-        identified_devices = np.append(identified_devices, np.argmax(yy[i]))
-    identified_devices = np.unique(identified_devices)
-
-    logging.info(f'identified_devices = {identified_devices}')
-
+        for d in range(len(device_ids_order)):
+            device_probability[d] = device_probability[d] + yy[i][d] 
+    device_probability = device_probability / yy.shape[0]
 
     response = {}
-    for i in identified_devices:
-        id = 2**int(i)
-        response[str(id)] = device_list[id]['name']
+    for d in range(len(identified_devices)):
+        response[str(device_ids_order[d])] = f'{round(device_probability[d]*100)}% {device_list[device_ids_order[d]]['name']}
+
+
+    #identified_devices = np.array([])
+    #for i in range(yy.shape[0]):
+    #    identified_devices = np.append(identified_devices, np.argmax(yy[i]))
+    #identified_devices = np.unique(identified_devices)
+    #logging.info(f'identified_devices = {identified_devices}')
+    #response = {}
+    #for i in identified_devices:
+    #    id = 2**int(i)
+    #    response[str(id)] = device_list[id]['name']
 
     logging.info(response)
     return response
