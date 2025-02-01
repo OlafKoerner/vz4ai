@@ -202,18 +202,18 @@ def algo_prediction(x):
             y[i] = microwave
 
 
-#Programm zur Erkennung von kitchen-light
-kitchen = 128
-start_kitchen = False
-for i in range(len(test_x['value']) - 2):  
-    if test_x['value'][i+2] - test_x['value'][i] > 270 and test_x['value'][i+2] - test_x['value'][i] < 310:
-        y[i+2] = kitchen
-        start_kitchen = True
-    if test_x['value'][i+2] - test_x['value'][i] > -270 and test_x['value'][i+2] - test_x['value'][i] < -310:
-        y[i] = kitchen
-        start_kitchen = False
-    if start_kitchen == True:
-        y[i] = kitchen
+    #Programm zur Erkennung von kitchen-light
+    kitchen = 128
+    start_kitchen = False
+    for i in range(len(test_x['value']) - 2):  
+        if test_x['value'][i+2] - test_x['value'][i] > 270 and test_x['value'][i+2] - test_x['value'][i] < 310:
+            y[i+2] = kitchen
+            start_kitchen = True
+        if test_x['value'][i+2] - test_x['value'][i] > -270 and test_x['value'][i+2] - test_x['value'][i] < -310:
+            y[i] = kitchen
+            start_kitchen = False
+        if start_kitchen == True:
+            y[i] = kitchen
 
 
     #Programm zur Erkennung von washing-machine
@@ -319,7 +319,6 @@ for i in range(len(test_x['value']) - 2):
             y[i] = kitchen
 
     return y
-
 
 
 @app.route('/logbook', method=['GET'], name='logbook')
