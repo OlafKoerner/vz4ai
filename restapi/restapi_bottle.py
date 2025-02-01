@@ -259,7 +259,12 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
     #model = keras.models.load_model(config('keras_filename'))
     yy = cnn_model.predict(xx)
 
-    logging.info(f'y = {yy}')
+    
+    logging.info(f'xx.shape: {xx.shape}')
+    logging.info(f'yy.shape: {yy.shape}')
+
+
+    logging.info(f'yy = {yy}')
 
     identified_devices = np.array([])
     for i in range(yy.shape[0]):
