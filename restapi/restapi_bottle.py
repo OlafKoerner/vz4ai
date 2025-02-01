@@ -170,6 +170,157 @@ def create_cnn_model(fname_cnn_model, window_length,  num_classes):
 
     return cnn_model
 
+def algo_prediction(x):
+    #keep structure of algo
+    test_x = {'value': x}
+    
+    #Programm zur Erkennung von espresso-machine
+    y = np.zeros(len(test_x['value']))
+    espresso = 1
+    start_espresso = False
+    for i in range(len(test_x['value']) - 1):
+        if test_x['value'][i+1] - test_x['value'][i] > 950 and test_x['value'][i+1] - test_x['value'][i] < 1050:
+            y[i+1] = espresso
+            start_espresso = True
+        if test_x['value'][i+1] - test_x['value'][i] > -850 and test_x['value'][i+1] - test_x['value'][i] < -950:
+            y[i] = espresso
+            start_espresso = False
+        if start_espresso == True:
+            y[i] = espresso
+
+    #Programm zur Erkennung von microwave
+    microwave = 64
+    start_microwave = False
+    for i in range(len(test_x['value']) - 3):
+        if test_x['value'][i+3] - test_x['value'][i] > 1150 and test_x['value'][i+3] - test_x['value'][i] < 1250:
+            y[i+3]= microwave
+            start_microwave = True
+        if test_x['value'][i+3]- test_x['value'][i] > -1150 and test_x['value'][i+3] - test_x['value'][i] < -1250:
+            y[i] = microwave
+            start_microwave = False
+        if start_microwave == True:
+            y[i] = microwave
+
+
+#Programm zur Erkennung von kitchen-light
+kitchen = 128
+start_kitchen = False
+for i in range(len(test_x['value']) - 2):  
+    if test_x['value'][i+2] - test_x['value'][i] > 270 and test_x['value'][i+2] - test_x['value'][i] < 310:
+        y[i+2] = kitchen
+        start_kitchen = True
+    if test_x['value'][i+2] - test_x['value'][i] > -270 and test_x['value'][i+2] - test_x['value'][i] < -310:
+        y[i] = kitchen
+        start_kitchen = False
+    if start_kitchen == True:
+        y[i] = kitchen
+
+
+    #Programm zur Erkennung von washing-machine
+    washing = 2
+    start_washing = False
+    for i in range(len(test_x['value'])-150):
+        if test_x['value'][i+150] - test_x['value'][i] > 2150 and test_x['value'][i+150] - test_x['value'][i] < 2300:
+            y[i+15] = washing
+            start_washing = True
+            start_i = i
+        if start_washing == True and i - start_i >= 7200:
+            start_washing = False
+        if start_washing == True:
+            y[i] = washing
+
+    #Programm zur Erkennung von dish-washer
+    dish = 4
+    start_dish = False
+    for i in range(len(test_x['value'])-6):
+        if test_x['value'][i+6] - test_x['value'][i] > 2200 and test_x['value'][i+6] - test_x['value'][i] < 2300:
+            y[i+6] = dish
+            start_dish = True
+            start_i = i
+        if start_dish == True and i - start_i >= 6300:
+            start_dish = False
+        if start_dish == True:
+            y[i] = dish
+
+    #Programm zur Erkennung von induction-cooker
+    y = np.zeros(len(test_x['value']))
+    induction = 8
+    start_induction = False
+    for i in range(len(test_x['value']) - 600):
+        if test_x['value'][i+1] - test_x['value'][i] > 950 and test_x['value'][i+1] - test_x['value'][i] < 1050:
+            y[i+1] = induction
+            start_induction = True
+        if np.var(test_x['value'][i:i+600]) < 430000:
+            start_induction = False
+        if start_induction == True:
+            y[i] = induction
+
+    #Programm zur Erkennung von oven
+    y = np.zeros(len(test_x['value']))
+    oven = 32
+    start_oven = False
+    for i in range(len(test_x['value']) - 600):
+        if test_x['value'][i+1] - test_x['value'][i] > 950 and test_x['value'][i+1] - test_x['value'][i] < 1050:
+            y[i+1] = oven
+            start_oven = True
+        if np.var(test_x['value'][i:i+600]) < 430000:
+            start_oven = False
+        if start_oven == True:
+            y[i] = oven
+
+    #Programm zur Erkennung von light
+    living = 256
+    start_living = False
+    for i in range(len(test_x['value']) - 2):
+        if test_x['value'][i+1] - test_x['value'][i] > 185 and test_x['value'][i+1] - test_x['value'][i] < 195:
+            y[i+1] = living
+            start_living = True
+        if test_x['value'][i+1] - test_x['value'][i] > -185 and test_x['value'][i+1] - test_x['value'][i] < -195:
+            y[i] = living
+            start_living = False
+        if start_living == True:
+            y[i] = living
+
+    #Programm zur Erkennung von light
+    dining = 512
+    start_dining = False
+
+    for i in range(len(test_x['value']) - 1):
+        if test_x['value'][i+1] - test_x['value'][i] > 25 and test_x['value'][i+1] - test_x['value'][i] < 35:
+            y[i+1] = dining
+            start_dining = True
+        if test_x['value'][i+1] - test_x['value'][i] > -25 and test_x['value'][i+1] - test_x['value'][i] < -35:
+            y[i] = dining
+            start_dining = False
+        if start_dining == True:
+            y[i] = dining
+
+    #Programm zur Erkennung von light
+    kitchen = 128
+    living = 256
+    dining = 512
+    ground = 1024
+    upper = 2048
+
+    start_kitchen = False
+    start_living = False
+    start_dining = False
+    start_ground = False
+    start_upper = False
+    for i in range(len(test_x['value']) - 2):
+        
+        if test_x['value'][i+2] - test_x['value'][i] > 270 and test_x['value'][i+2] - test_x['value'][i] < 315:
+            y[i+2] = kitchen
+            start_kitchen = True
+        if test_x['value'][i+2] - test_x['value'][i] > -270 and test_x['value'][i+2] - test_x['value'][i] < -310:
+            y[i] = kitchen
+            start_kitchen = False
+        if start_kitchen == True:
+            y[i] = kitchen
+
+    return y
+
+
 
 @app.route('/logbook', method=['GET'], name='logbook')
 def get_logbook():
@@ -249,6 +400,8 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
             x = np.append(x, row['value'])
     logging.info(f'read {x} power values from db')
     
+    response = f'Algo prediction: {algo_prediction(x)}\n'
+
     #fill power values in batches with window_length. cut left over values
     window_length = int(config('cnn_window_length', cast=int))
     i = 0 + window_length
@@ -281,7 +434,7 @@ def get_identified_devices(ts_from_str, ts_to_str, window_length_str): # -> dict
 
     logging.info(device_ids_order)
 
-    response = f'CNN detected: {device_list[device_ids_order[np.argmax(device_probability)]]["name"]}\n'
+    response = response + f'CNN detected: {device_list[device_ids_order[np.argmax(device_probability)]]["name"]}\n'
     for d in range(len(device_ids_order)):
         response = response + f'{round(device_probability[d]*100)}% {device_list[device_ids_order[d]]["name"]}\n'
 
@@ -411,79 +564,6 @@ def update_undo(): # -> dict[str, str]:
         response['status'] = f'UPDATE_UNDO: not possible since no update history available'
         logging.warning(response)
         return response
-
-'''
-@app.route('/remove/<ts_from>/<ts_to>/<device_id>', method=['POST'], name='remove')
-def remove_device_ids(ts_from, ts_to, device_id): # -> dict[str, str]:
-    conn = connect_mysql()
-    cur = conn.cursor()
-    try:
-        #count amount of all data points
-        amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(ts_from), float(ts_to)))
-        #remove device id from data points
-        amount_written = cur.execute('UPDATE data SET device = device & ~"%s" WHERE timestamp >= "%s" AND timestamp <= "%s";', (int(device_id), float(ts_from), float(ts_to)))
-        #commit update to db
-        conn.commit() #https://stackoverflow.com/questions/41916569/cant-write-into-mysql-database-from-python
-        #log change for potential undo
-        remove_history.append({"device_id" : device_id, "ts_from" : ts_from, "ts_to" : ts_to})
-        logging.info('REMOVE: size of remove history now: ', len(remove_history))
-        #count amount of data points including device_id
-        amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = 0;', (float(ts_from), float(ts_to), int(device_id)))
-        conn.close()
-    except pymysql.Error as e:
-        logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
-
-    logging.info(f'selected: {amount_selected}, written: {amount_written}, committed: {amount_committed}')
-    #check if remove was committed successfully
-    response = {}
-    response_short = {}
-    if amount_selected == amount_committed:
-        response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully remove from database for all {amount_selected} data points by removing {amount_written} data points.'
-        response_short['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) successfully removed from database.'
-        logbook_add(device_id=int(device_id), command_str='REMOVE', ts_min=float(ts_from), ts_max=float(ts_to), status_str=response['status'])
-    else:
-        response['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be written to database ... device id only removed from {amount_committed} of {amount_selected} data points. Please contact your SYSTEMADMIN !!!'
-        response_short['status'] = f'Device ID {device_id} ({device_list[int(device_id)]["name"]}) could not be removed from database ... Please contact your SYSTEMADMIN !!!'
-    logging.info(response)
-    return response_short
-        
-
-@app.route('/remove_undo', method=['POST'], name='remove_undo')
-def remove_undo(): # -> dict[str, str]:
-    if len(remove_history) > 1 :
-        conn = connect_mysql()
-        cur = conn.cursor()
-        try:
-            #count amount of all data points
-            amount_selected = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s";', (float(remove_history[-1]["ts_from"]), float(remove_history[-1]["ts_to"])))
-            #re-add device id to data points
-            amount_written  = cur.execute('UPDATE data SET device = device | "%s" WHERE timestamp >= "%s" AND timestamp <= "%s";',   (int(remove_history[-1]["device_id"]), float(remove_history[-1]["ts_from"]), float(remove_history[-1]["ts_to"])))
-            #commit update to db
-            conn.commit()
-            #count amount of data points including device_id
-            amount_committed = cur.execute('SELECT * FROM data WHERE timestamp >= "%s" AND timestamp <= "%s" AND device & "%s" = "%s";', (float(remove_history[-1]["ts_from"]), float(remove_history[-1]["ts_to"]), int(remove_history[-1]["device_id"]), int(remove_history[-1]["device_id"])))
-            conn.close()
-        except pymysql.Error as e:
-            logging.error('Got error {!r}, errno is {}'.format(e, e.args[0]), exc_info=True)
-
-        response = {}
-        response_short = {}
-        if amount_selected == amount_committed:
-                response['status'] = f'selected == committed for Device ID {remove_history[-1]["device_id"]} ({device_list[int(remove_history[-1]["device_id"])]["name"]}) successfully re-added for all {amount_selected} data points by changing {amount_written} data points.'
-                response_short['status']= f'Re-added Device ID {remove_history[-1]["device_id"]} ({device_list[int(remove_history[-1]["device_id"])]["name"]}) successfully.'
-                logbook_add(device_id=int(remove_history[-1]["device_id"]), command_str='REMOVE_UNDO', ts_min=float(remove_history[-1]["ts_from"]), ts_max=float(remove_history[-1]["ts_to"]), status_str=response['status'])
-                remove_history.pop() # remove last item
-        else:
-                response['status'] = f'selected != committed for Device ID {remove_history[-1]["device_id"]} ({device_list[int(remove_history[-1]["device_id"])]["name"]}) could not be written to database ... still {amount_selected - amount_committed} data points missing the device. Please contact your SYSTEMADMIN !!!'
-                response_short['status'] = f'Failed to remove Device ID {remove_history[-1]["device_id"]} ({device_list[int(remove_history[-1]["device_id"])]["name"]})... Please contact your SYSTEMADMIN !!!'
-        logging.info(response)
-        return response_short
-    else:
-        response = {}
-        response['status'] = f'REMOVE_UNDO: not possible since no remove history available'
-        logging.warning(response)
-        return response
-'''
 
 if __name__ == "__main__":
     try:
