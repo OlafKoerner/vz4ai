@@ -54,7 +54,8 @@ device_list = {
         32: {'name': 'oven', 'minpow': 800},
         64: {'name': 'microwave', 'minpow': 800},
         128: {'name': 'kitchen-light', 'minpow': 200},
-        256: {'name': 'living-room-light', 'minpow': 200},
+        #256: {'name': 'living-room-light', 'minpow': 200},
+        256: {'name': 'base-load', 'minpow': 200},
         512: {'name': 'dining-room-light', 'minpow': 200},
         1024: {'name': 'ground-floor-light', 'minpow': 200},
         2048: {'name': 'upper-floor-light', 'minpow': 200}}
