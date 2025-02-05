@@ -273,7 +273,7 @@ def algo_prediction(x):
 
     #Auswertung
     unique, counts = np.unique(y, return_counts=True)
-    distribution = dict(zip(unique, counts))
+    distribution = dict(zip(device_list[unique]['name'], counts))
     prediction = max(distribution, key=distribution.get)
     return f'Algo prediction: {prediction}\n{distribution}\n'
 
