@@ -175,54 +175,41 @@ def algo_prediction(x):
     #keep structure of algo
     test_x = {'value': x}
     
-    #Programm zur Erkennung von espresso-machine
-    y = np.zeros(len(test_x['value']))
-    espresso = 1
-    start_espresso = False
-    for i in range(len(test_x['value']) - 1):
-        if test_x['value'][i+1] - test_x['value'][i] > 950 and test_x['value'][i+1] - test_x['value'][i] < 1050:
-            y[i+1] = espresso
-            start_espresso = True
-        if test_x['value'][i+1] - test_x['value'][i] > -850 and test_x['value'][i+1] - test_x['value'][i] < -950:
-            y[i] = espresso
-            start_espresso = False
-        if start_espresso == True:
-            y[i] = espresso
-
-    #Programm zur Erkennung von microwave
-    microwave = 64
-    start_microwave = False
-    for i in range(len(test_x['value']) - 3):
-        if test_x['value'][i+3] - test_x['value'][i] > 1150 and test_x['value'][i+3] - test_x['value'][i] < 1250:
-            y[i+3]= microwave
-            start_microwave = True
-        if test_x['value'][i+3]- test_x['value'][i] > -1150 and test_x['value'][i+3] - test_x['value'][i] < -1250:
-            y[i] = microwave
-            start_microwave = False
-        if start_microwave == True:
-            y[i] = microwave
-
-
     #Programm zur Erkennung von kitchen-light
+    y = np.zeros(len(test_x['value']))
     kitchen = 128
     start_kitchen = False
-    for i in range(len(test_x['value']) - 2):  
-        if test_x['value'][i+2] - test_x['value'][i] > 270 and test_x['value'][i+2] - test_x['value'][i] < 310:
-            y[i+2] = kitchen
+    for i in range(len(test_x['value']) - 1):  
+        if test_x['value'][i+1] - test_x['value'][i] > 280 and test_x['value'][i+1] - test_x['value'][i] < 310:
+            y[i+1] = kitchen
             start_kitchen = True
-        if test_x['value'][i+2] - test_x['value'][i] > -270 and test_x['value'][i+2] - test_x['value'][i] < -310:
+        if test_x['value'][i+1] - test_x['value'][i] < -280 and test_x['value'][i+1] - test_x['value'][i] > -310:
             y[i] = kitchen
             start_kitchen = False
         if start_kitchen == True:
             y[i] = kitchen
 
+    #Programm zur Erkennung von espresso-machine
+    #y = np.zeros(len(test_x['value']))
+    espresso = 1
+    start_espresso = False
+    for i in range(len(test_x['value']) - 3):
+        if test_x['value'][i+3] - test_x['value'][i] > 950 and test_x['value'][i+3] - test_x['value'][i] < 1050:
+            y[i+3]= espresso
+            start_espresso = True
+        if test_x['value'][i+3]- test_x['value'][i] < -950 and test_x['value'][i+3] - test_x['value'][i] > -1050:
+            y[i] = espresso
+            start_espresso = False
+        if start_espresso == True:
+            y[i] = espresso
 
     #Programm zur Erkennung von washing-machine
+    #y = np.zeros(len(test_x['value']))
     washing = 2
     start_washing = False
-    for i in range(len(test_x['value'])-150):
+    for i in range(len(test_x['value']) - 150):
         if test_x['value'][i+150] - test_x['value'][i] > 2150 and test_x['value'][i+150] - test_x['value'][i] < 2300:
-            y[i+15] = washing
+            y[i+150] = washing
             start_washing = True
             start_i = i
         if start_washing == True and i - start_i >= 7200:
@@ -230,7 +217,48 @@ def algo_prediction(x):
         if start_washing == True:
             y[i] = washing
 
+    #Programm zur Erkennung von microwave
+    #y = np.zeros(len(test_x['value']))
+    microwave = 64
+    start_microwave = False
+    for i in range(len(test_x['value']) - 3):
+        if test_x['value'][i+3] - test_x['value'][i] > 1150 and test_x['value'][i+3] - test_x['value'][i] < 1250:
+            y[i+3]= microwave
+            start_microwave = True
+        if test_x['value'][i+3]- test_x['value'][i] < -1150 and test_x['value'][i+3] - test_x['value'][i] > -1250:
+            y[i] = microwave
+            start_microwave = False
+        if start_microwave == True:
+            y[i] = microwave
+
+    #Programm zur Erkennung von induction-cooker
+    #y = np.zeros(len(test_x['value']))
+    induction = 8
+    start_induction = False
+    for i in range(len(test_x['value']) - 180):
+        if np.var(test_x['value'][i:i+180]) > 361980 and np.var(test_x['value'][i:i+180]) < 1836900:
+            y[i:i+180] = induction
+            start_induction = True
+        if np.var(test_x['value'][i:i+180]) < 361980 or np.var(test_x['value'][i:i+180]) > 1836900:
+            start_induction = False
+        if start_induction == True:
+            y[i] = induction
+
+    #Programm zur Erkennung von oven
+    #y = np.zeros(len(test_x['value']))
+    oven = 32
+    start_oven = False
+    for i in range(len(test_x['value']) - 150):
+        if np.var(test_x['value'][i:i+150]) > 427160 and np.var(test_x['value'][i:i+150]) < 1322000:
+            y[i:i+150] = oven
+            start_oven = True
+        if np.var(test_x['value'][i:i+150]) < 427160 or np.var(test_x['value'][i:i+150]) > 1322000:
+            start_oven = False
+        if start_oven == True:
+            y[i] = oven
+
     #Programm zur Erkennung von dish-washer
+    #y = np.zeros(len(test_x['value']))
     dish = 4
     start_dish = False
     for i in range(len(test_x['value'])-6):
@@ -242,82 +270,6 @@ def algo_prediction(x):
             start_dish = False
         if start_dish == True:
             y[i] = dish
-
-    #Programm zur Erkennung von induction-cooker
-    #y = np.zeros(len(test_x['value']))
-    induction = 8
-    start_induction = False
-    for i in range(len(test_x['value']) - 600):
-        if test_x['value'][i+1] - test_x['value'][i] > 950 and test_x['value'][i+1] - test_x['value'][i] < 1050:
-            y[i+1] = induction
-            start_induction = True
-        if np.var(test_x['value'][i:i+600]) < 430000:
-            start_induction = False
-        if start_induction == True:
-            y[i] = induction
-
-    #Programm zur Erkennung von oven
-    #y = np.zeros(len(test_x['value']))
-    oven = 32
-    start_oven = False
-    for i in range(len(test_x['value']) - 600):
-        if test_x['value'][i+1] - test_x['value'][i] > 950 and test_x['value'][i+1] - test_x['value'][i] < 1050:
-            y[i+1] = oven
-            start_oven = True
-        if np.var(test_x['value'][i:i+600]) < 430000:
-            start_oven = False
-        if start_oven == True:
-            y[i] = oven
-
-    #Programm zur Erkennung von light
-    living = 256
-    start_living = False
-    for i in range(len(test_x['value']) - 2):
-        if test_x['value'][i+1] - test_x['value'][i] > 185 and test_x['value'][i+1] - test_x['value'][i] < 195:
-            y[i+1] = living
-            start_living = True
-        if test_x['value'][i+1] - test_x['value'][i] > -185 and test_x['value'][i+1] - test_x['value'][i] < -195:
-            y[i] = living
-            start_living = False
-        if start_living == True:
-            y[i] = living
-
-    #Programm zur Erkennung von light
-    dining = 512
-    start_dining = False
-
-    for i in range(len(test_x['value']) - 1):
-        if test_x['value'][i+1] - test_x['value'][i] > 25 and test_x['value'][i+1] - test_x['value'][i] < 35:
-            y[i+1] = dining
-            start_dining = True
-        if test_x['value'][i+1] - test_x['value'][i] > -25 and test_x['value'][i+1] - test_x['value'][i] < -35:
-            y[i] = dining
-            start_dining = False
-        if start_dining == True:
-            y[i] = dining
-
-    #Programm zur Erkennung von light
-    kitchen = 128
-    living = 256
-    dining = 512
-    ground = 1024
-    upper = 2048
-
-    start_kitchen = False
-    start_living = False
-    start_dining = False
-    start_ground = False
-    start_upper = False
-    for i in range(len(test_x['value']) - 2):
-        
-        if test_x['value'][i+2] - test_x['value'][i] > 270 and test_x['value'][i+2] - test_x['value'][i] < 315:
-            y[i+2] = kitchen
-            start_kitchen = True
-        if test_x['value'][i+2] - test_x['value'][i] > -270 and test_x['value'][i+2] - test_x['value'][i] < -310:
-            y[i] = kitchen
-            start_kitchen = False
-        if start_kitchen == True:
-            y[i] = kitchen
 
     #Auswertung
     unique, counts = np.unique(y, return_counts=True)
