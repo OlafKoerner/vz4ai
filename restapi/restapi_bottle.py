@@ -174,9 +174,11 @@ def create_cnn_model(fname_cnn_model, window_length,  num_classes):
 def algo_prediction(x):
     #keep structure of algo
     test_x = {'value': x}
+    logging.info(f"Algo test with {len(test_x['value'])} power values...")
     
     #Programm zur Erkennung von kitchen-light
-    y = np.zeros(len(test_x['value']))
+    y = np.full(len(test_x['value']), 256)
+
     kitchen = 128
     start_kitchen = False
     for i in range(len(test_x['value']) - 1):  
@@ -273,9 +275,18 @@ def algo_prediction(x):
 
     #Auswertung
     unique, counts = np.unique(y, return_counts=True)
-    distribution = dict(zip(device_list[unique]['name'], counts))
+    percent = (100 * counts / np.sum(counts)).astype(int)
+    distribution = dict(zip(unique, percent))
     prediction = max(distribution, key=distribution.get)
-    return f'Algo prediction: {prediction}\n{distribution}\n'
+
+    distribution_name = {}
+    for k in distribution.keys():
+       distribution_name[device_list[k]['name']] = distribution[k]
+
+    prediction_name = device_list[prediction]['name']
+    response = f'Algo prediction: {prediction_name}\n{distribution_name}\n'
+    logging.info(response)
+    return response
 
 
 @app.route('/logbook', method=['GET'], name='logbook')
