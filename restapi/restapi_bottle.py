@@ -278,7 +278,7 @@ def algo_prediction(x):
     percent = (100 * counts / np.sum(counts)).astype(int)
     distribution = dict(zip(unique, percent))
     prediction = max(distribution, key=distribution.get)
-
+  
     distribution_name = {}
     for k in distribution.keys():
        distribution_name[device_list[k]['name']] = distribution[k]
@@ -287,7 +287,6 @@ def algo_prediction(x):
     response = f'Algo prediction: {prediction_name}\n{distribution_name}\n'
     logging.info(response)
     return response
-
 
 @app.route('/logbook', method=['GET'], name='logbook')
 def get_logbook():
