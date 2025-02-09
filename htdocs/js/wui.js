@@ -1002,31 +1002,31 @@ vz.wui.isConsumptionMode = function() {
  * Refresh plot with new data
  */
 vz.wui.refresh = function() {
-       /* OKO already define REST-API url for the case that device button was pressed */
-        var url_rest_api = 'http://192.168.178.185:8082/'
+	/* OKO already define REST-API url for the case that device button was pressed */
+	var url_rest_api = 'http://192.168.178.185:8082/'
 
-        /* OKO function to write device ID to database via REST API (bottle) */
-        async function read_pi_disk_usage() {       
-                try 
-                { 
-                        const response = await fetch(url_rest_api + 'diskspace', { 
-                                        /*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
-                                        method: "GET",
-                                        headers: {
-                                                'Accept': 'application/json',
-                                                'Content-Type': 'application/json'
-                                        },
-                                        //OKO not working for old iPhone: signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
-                                }
-                        )
-                        const text = await response.text()
-                        return text;
-                } 
-                catch(err) 
-                { 
-                        alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); 
-                } 
-        }
+	/* OKO function to write device ID to database via REST API (bottle) */
+	async function read_pi_disk_usage() {       
+			try 
+			{ 
+					const response = await fetch(url_rest_api + 'diskspace', { 
+									/*mode: "cors",  https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options  */
+									method: "GET",
+									headers: {
+											'Accept': 'application/json',
+											'Content-Type': 'application/json'
+									},
+									//OKO not working for old iPhone: signal: AbortSignal.timeout(5000) /* https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal#aborting_a_fetch_operation_with_a_timeout  */
+							}
+					)
+					const text = await response.text()
+					return text;
+			} 
+			catch(err) 
+			{ 
+					alert(`Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`); 
+			} 
+	}
 	//OKO draw current diskspace
 	read_pi_disk_usage().then( text => { 
 		textObject = JSON.parse(text); 
