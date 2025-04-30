@@ -1031,7 +1031,7 @@ vz.wui.refresh = function() {
 	read_pi_disk_usage().then( text => { 
 		textObject = JSON.parse(text); 
 		$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free);
-		$('#controls#espresso-machine').html("test"); //OKO test
+		//$('#controls#espresso-machine').html("test"); //OKO test
 	});
 
 	var delta = vz.options.plot.xaxis.max - vz.options.plot.xaxis.min;
@@ -1039,6 +1039,29 @@ vz.wui.refresh = function() {
 		new Date().getTime() - delta,
 		new Date().getTime()
 	);
+	
+	//OKO continuous classification
+  /** 
+	try {
+					var timeframe = Math.round(vz.options.plot.xaxis.min) + '/' + Math.round(vz.options.plot.xaxis.max) + '/';
+					var window = 40; //OKO 40 might be wrong since adjustable... just for testing
+					const response = await fetch(url_rest_api + 'classification/' + timeframe + window, {
+							mode: "cors",  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options 
+							method: "GET",
+							headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+						}
+					)
+					var classified_devices = await response.text();
+					if (classified_devices == 'espresso') {
+						$('#espresso-machine').style.background="color:red";
+						// or $('#espresso-machine')[0].style.background="color:red";
+						// or $('#espresso-machine').get(0).style.background="color:red";
+						// OKO check as well: https://stackoverflow.com/questions/26843566/document-getelementbyidid-vs-id
+					}
+					//alert(button_str + control + '\n\n' + await response.text());
+				} catch(err) { alert(button_str + control + '\n\n' + `Error: ${err.name}, ${err.message}.\nRaspberryPi not reachable. Restart REST-API (bottle) with:\n$ python3 my_bottle_restapi.py &`);}
+		}
+	*/
 };
 
 /**
