@@ -1030,9 +1030,9 @@ vz.wui.refresh = function() {
 	//OKO draw current diskspace
 	read_pi_disk_usage().then( text => { 
 		textObject = JSON.parse(text); 
-		$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free);
-		//$('#controls#espresso-machine').html("test"); //OKO test
-	});
+		//$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free);
+		$('#diskspace').html(window.location.protocol + "//" + window.loction.hostname);
+		});
 
 	var delta = vz.options.plot.xaxis.max - vz.options.plot.xaxis.min;
 	vz.wui.zoom( // move plot
