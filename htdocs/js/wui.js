@@ -1031,7 +1031,7 @@ vz.wui.refresh = function() {
 	read_pi_disk_usage().then( text => { 
 		textObject = JSON.parse(text); 
 		//$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free);
-		$('#diskspace').html(window.location.protocol + "//" + window.loction.hostname);
+		$('#diskspace').html(window.location.protocol + "//" + window.loction.host);
 		});
 
 	var delta = vz.options.plot.xaxis.max - vz.options.plot.xaxis.min;
