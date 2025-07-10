@@ -566,7 +566,7 @@ vz.wui.handleControls = function(action, keepPeriodStartFixed) {
 	}
 
 	/* OKO already define REST-API url for the case that device button was pressed */
-	var url_rest_api = 'http://192.168.178.185:8082/';
+	var url_rest_api = window.location.protocol + '//' + window.location.hostname + ':8082/';
 	var timeframe = Math.round(vz.options.plot.xaxis.min) + '/' + Math.round(vz.options.plot.xaxis.max) + '/';
 	var button_str = 'BUTTON: ';
 
@@ -1003,7 +1003,7 @@ vz.wui.isConsumptionMode = function() {
  */
 vz.wui.refresh = function() {
 	/* OKO already define REST-API url for the case that device button was pressed */
-	var url_rest_api = 'http://192.168.178.185:8082/'
+	var url_rest_api = window.location.protocol + '//' + window.location.hostname + ':8082/'
 
 	/* OKO function to write device ID to database via REST API (bottle) */
 	async function read_pi_disk_usage() {       
@@ -1030,8 +1030,7 @@ vz.wui.refresh = function() {
 	//OKO draw current diskspace
 	read_pi_disk_usage().then( text => { 
 		textObject = JSON.parse(text); 
-		//$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free);
-		$('#diskspace').html(window.location.protocol + "//" + window.location.hostname);
+		$('#diskspace').html("used percent = " + textObject.used_percent + " and free = " + textObject.free);
 		});
 
 	var delta = vz.options.plot.xaxis.max - vz.options.plot.xaxis.min;
